@@ -1,14 +1,13 @@
 // Imports.
-use cygnus::orbiters::albireo::{IAlbireoDispatcher, IAlbireoDispatcherTrait};
-use cygnus::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
-use cygnus::types::orbiter::{Orbiter};
-use cygnus::types::shuttle::{Shuttle};
-
-// Libraries
-use starknet::ContractAddress;
 use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
 use cygnus::collateral::{ICollateralDispatcher, ICollateralDispatcherTrait};
-//use cygnus::dao::dao_reserves::{ICygnusDAOReservesDispatcher, ICygnusDAOReservesDispatcherTrait};
+use cygnus::dao_reserves::{ICygnusDAOReservesDispatcher, ICygnusDAOReservesDispatcherTrait};
+use cygnus::orbiters::albireo::{IAlbireoDispatcher, IAlbireoDispatcherTrait};
+use cygnus::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
+use cygnus::types::orbiter::Orbiter;
+use cygnus::types::shuttle::Shuttle;
+
+use starknet::ContractAddress;
 
 /// # Interface - Hangar18
 #[starknet::interface]
@@ -18,10 +17,10 @@ pub trait IHangar18<T> {
     /// --------------------------------------------------------------------------------------------------------
 
     /// # Returns the name of the factory (`Hangar18`)
-    fn name(self: @T) -> felt252;
+    fn name(self: @T) -> ByteArray;
 
     /// # Returns the version of the hangar18 deployed (to be compatible with other chains)
-    fn version(self: @T) -> felt252;
+    fn version(self: @T) -> ByteArray;
 
     /// # Returns the address of the current admin, the pool/orbiter deployer
     fn admin(self: @T) -> ContractAddress;
@@ -67,9 +66,6 @@ pub trait IHangar18<T> {
 
     /// # Returns the chain ID of the hangar18
     fn chain_id(self: @T) -> felt252;
-
-    /// # Returns the block timestamp
-    fn block_timestamp(self: @T) -> u64;
 
     /// Gets a lending pool tvl (usdc deposits + lp deposits) priced in USD
     ///
@@ -167,7 +163,7 @@ pub trait IHangar18<T> {
     ///
     /// # Arguments
     /// * `new_dao_reserves` - The address of the new DAO reserves
-    fn set_dao_reserves(ref self: T, new_dao_reserves: ContractAddress);
+    fn set_dao_reserves(ref self: T, new_dao_reserves: ICygnusDAOReservesDispatcher);
 
     /// Switches orbiter status, reverting future deployments with this orbiter unless turned on again
     ///

@@ -1,3 +1,4 @@
+use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
 /// # Title
 /// * `CygnusCollateral`
 ///
@@ -7,7 +8,6 @@
 /// # Author
 /// * CygnusDAO
 use starknet::ContractAddress;
-// use cygnus::terminal::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
 
 /// # Interface
 /// * `ICollateral`
@@ -180,7 +180,7 @@ pub trait ICollateral<T> {
     ///
     /// # Arguments
     /// * `borrowable` - The address of the borrowable
-    fn set_borrowable(ref self: T, borrowable: ContractAddress); //TODO
+    fn set_borrowable(ref self: T, borrowable: IBorrowableDispatcher);
 
     /// Sets liquidation fee 
     ///
