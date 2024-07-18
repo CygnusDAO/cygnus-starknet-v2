@@ -12,9 +12,9 @@ use cygnus::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
 /// * `name` - Human friendly name to identify deployers (ie. "Jediswap Pools", "Ekubo Pools", etc.)
 #[derive(Drop, starknet::Store, Serde, Copy)]
 pub struct Orbiter {
-    status: bool,
-    orbiter_id: u32,
-    albireo_orbiter: IAlbireoDispatcher,
-    deneb_orbiter: IDenebDispatcher,
-    name: felt252
+    pub status: bool,
+    pub orbiter_id: u32,
+    pub albireo_orbiter: IAlbireoDispatcher,
+    pub deneb_orbiter: IDenebDispatcher,
+    pub name: felt252
 }
