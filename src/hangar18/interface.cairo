@@ -1,7 +1,7 @@
 // Imports.
 use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
 use cygnus::collateral::{ICollateralDispatcher, ICollateralDispatcherTrait};
-use cygnus::dao_reserves::{ICygnusDAOReservesDispatcher, ICygnusDAOReservesDispatcherTrait};
+use cygnus::dao::{ICygnusDAOReservesDispatcher, ICygnusDAOReservesDispatcherTrait};
 use cygnus::orbiters::albireo::{IAlbireoDispatcher, IAlbireoDispatcherTrait};
 use cygnus::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
 use cygnus::types::orbiter::Orbiter;
@@ -29,7 +29,7 @@ pub trait IHangar18<T> {
     fn pending_admin(self: @T) -> ContractAddress;
 
     /// # Returns the address of the oracle registry
-    fn oracle_registry(self: @T) -> ContractAddress;
+    fn nebula_registry(self: @T) -> ContractAddress;
 
     /// # Returns the address of the DAO reserves
     fn dao_reserves(self: @T) -> ContractAddress;
@@ -74,7 +74,7 @@ pub trait IHangar18<T> {
     ///
     /// # Returns
     /// * The TVL of the shuttle
-    fn shuttle_tvl_usd(self: @T, shuttle_id: u32) -> u128;
+    fn shuttle_tvl_usd(self: @T, shuttle_id: u32) -> u256;
 
     /// Gets a collateral tvl (LP deposits) priced in USD
     ///
@@ -83,7 +83,7 @@ pub trait IHangar18<T> {
     ///
     /// # Returns
     /// * The TVL of the collateral
-    fn collateral_tvl_usd(self: @T, shuttle_id: u32) -> u128;
+    fn collateral_tvl_usd(self: @T, shuttle_id: u32) -> u256;
 
     /// Gets a borrowable tvl (USDC deposits + borrows) priced in USD
     ///
@@ -92,23 +92,23 @@ pub trait IHangar18<T> {
     ///
     /// # Returns
     /// * The TVL of the borrowable
-    fn borrowable_tvl_usd(self: @T, shuttle_id: u32) -> u128;
+    fn borrowable_tvl_usd(self: @T, shuttle_id: u32) -> u256;
 
     /// # Returns
     /// * Cygnus protocol current total borrows
-    fn cygnus_total_borrows_usd(self: @T) -> u128;
+    fn cygnus_total_borrows_usd(self: @T) -> u256;
 
     /// # Returns
     /// * The tvl of all collaterals 
-    fn all_collaterals_tvl(self: @T) -> u128;
+    fn all_collaterals_tvl(self: @T) -> u256;
 
     /// # Returns
     /// * The tvl of all borrowbales
-    fn all_borrowables_tvl(self: @T) -> u128;
+    fn all_borrowables_tvl(self: @T) -> u256;
 
     /// # Returns
     /// * The tvl of the whole protocol on Starknet
-    fn cygnus_tvl_usd(self: @T) -> u128;
+    fn cygnus_tvl_usd(self: @T) -> u256;
 
     /// --------------------------------------------------------------------------------------------------------
     ///                                      NON-CONSTANT FUNCTIONS

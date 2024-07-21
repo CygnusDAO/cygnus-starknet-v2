@@ -1,5 +1,5 @@
 use cygnus::types::nebula::LPInfo;
-use cygnus::types::nebula_registry::Nebula;
+use cygnus::types::registry::Nebula;
 use starknet::ContractAddress;
 //use array::ArrayTrait;
 
@@ -34,7 +34,7 @@ pub trait INebulaRegistry<T> {
     ///
     /// # Returns
     /// * The price of the lp token (gets the nebula for the LP, and calls `lp_token_price_usd`)
-    fn get_lp_token_price_usd(self: @T, lp_token_pair: ContractAddress) -> u128;
+    fn get_lp_token_price_usd(self: @T, lp_token_pair: ContractAddress) -> u256;
 
     /// # Arguments
     /// * `nebula_address` - The address of the nebula implementation

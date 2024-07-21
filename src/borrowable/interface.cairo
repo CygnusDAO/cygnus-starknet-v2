@@ -18,7 +18,7 @@ pub trait IBorrowable<T> {
     ///                                          1. ERC20
     /// --------------------------------------------------------------------------------------------------------
 
-    /// Open zeppeplin's implementation of erc20 with u128
+    /// Open zeppeplin's implementation of erc20 with u256
     /// https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/token/erc20/erc20.cairo
     ///
     /// commit-hash: 841a073
@@ -33,40 +33,40 @@ pub trait IBorrowable<T> {
     fn decimals(self: @T) -> u8;
 
     /// Returns the amount of tokens owned by `account`.
-    fn balance_of(self: @T, account: ContractAddress) -> u128;
-    fn balanceOf(self: @T, account: ContractAddress) -> u128;
+    fn balance_of(self: @T, account: ContractAddress) -> u256;
+    fn balanceOf(self: @T, account: ContractAddress) -> u256;
 
     /// Returns the value of tokens in existence.
-    fn total_supply(self: @T) -> u128;
-    fn totalSupply(self: @T) -> u128;
+    fn total_supply(self: @T) -> u256;
+    fn totalSupply(self: @T) -> u256;
 
     /// Returns the remaining number of tokens that `spender` is allowed to spend on behalf of `owner` 
     /// through `transfer_from`.
     /// This is zero by default. This value changes when `approve` or `transfer_from` are called.
-    fn allowance(self: @T, owner: ContractAddress, spender: ContractAddress) -> u128;
+    fn allowance(self: @T, owner: ContractAddress, spender: ContractAddress) -> u256;
 
     /// Sets `amount` as the allowance of `spender` over the caller’s tokens.
-    fn approve(ref self: T, spender: ContractAddress, amount: u128) -> bool;
+    fn approve(ref self: T, spender: ContractAddress, amount: u256) -> bool;
 
     /// Moves `amount` tokens from the caller's token balance to `to`.
     /// Emits a `Transfer` event.
-    fn transfer(ref self: T, recipient: ContractAddress, amount: u128) -> bool;
+    fn transfer(ref self: T, recipient: ContractAddress, amount: u256) -> bool;
 
     /// Moves `amount` tokens from `from` to `to` using the allowance mechanism.
     /// `amount` is then deducted from the caller's allowance.
     /// Emits a `Transfer` event.
-    fn transfer_from(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u128) -> bool;
-    fn transferFrom(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u128) -> bool;
+    fn transfer_from(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
+    fn transferFrom(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     /// Increases the allowance granted from the caller to `spender` by `added_value`.
     /// Emits an `Approval` event indicating the updated allowance.
-    fn increase_allowance(ref self: T, spender: ContractAddress, added_value: u128) -> bool;
-    fn increaseAllowance(ref self: T, spender: ContractAddress, added_value: u128) -> bool;
+    fn increase_allowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
+    fn increaseAllowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
 
     /// Decreases the allowance granted from the caller to `spender` by `subtracted_value`.
     /// Emits an `Approval` event indicating the updated allowance.
-    fn decrease_allowance(ref self: T, spender: ContractAddress, subtracted_value: u128) -> bool;
-    fn decreaseAllowance(ref self: T, spender: ContractAddress, subtracted_value: u128) -> bool;
+    fn decrease_allowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
+    fn decreaseAllowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
 
     /// --------------------------------------------------------------------------------------------------------
     ///                                          2. TERMINAL
@@ -103,15 +103,15 @@ pub trait IBorrowable<T> {
     fn shuttle_id(self: @T) -> u32;
 
     /// # Returns the total balance of the underlying deposited in the strategy
-    fn total_balance(self: @T) -> u128;
+    fn total_balance(self: @T) -> u256;
 
     /// Returns the total USD assets held by the vault including assets currently being borrowed.
     /// (ie total_borrows + total_balance)
-    fn total_assets(self: @T) -> u128;
+    fn total_assets(self: @T) -> u256;
 
     /// Returns the exchange rate between 1 unit of CygLP shares to assets. IE. How much USD
     /// can be redeemed by redeeming 1 unit of CygUSD shares, it should never be below 1e18.
-    fn exchange_rate(self: @T) -> u128;
+    fn exchange_rate(self: @T) -> u256;
 
     /// Deposits underlying assets in the pool
     ///
@@ -124,7 +124,7 @@ pub trait IBorrowable<T> {
     ///
     /// # Returns
     /// * The amount of shares minted
-    fn deposit(ref self: T, assets: u128, recipient: ContractAddress) -> u128;
+    fn deposit(ref self: T, assets: u256, recipient: ContractAddress) -> u256;
 
 
     /// Redeems CygUSD for USDC Tokens
@@ -139,7 +139,7 @@ pub trait IBorrowable<T> {
     ///
     /// # Returns
     /// * The amount of assets withdrawn
-    fn redeem(ref self: T, shares: u128, recipient: ContractAddress, owner: ContractAddress) -> u128;
+    fn redeem(ref self: T, shares: u256, recipient: ContractAddress, owner: ContractAddress) -> u256;
 
     /// Force sync our balance with the total deposited in the strategy
     ///
@@ -152,28 +152,28 @@ pub trait IBorrowable<T> {
     /// --------------------------------------------------------------------------------------------------------
 
     /// # Returns the maximum base rate allowed
-    fn BASE_RATE_MAX(self: @T) -> u128;
+    fn BASE_RATE_MAX(self: @T) -> u256;
 
     /// # Returns the maximum reserve factor allowed
-    fn RESERVE_FACTOR_MAX(self: @T) -> u128;
+    fn RESERVE_FACTOR_MAX(self: @T) -> u256;
 
     /// # Returns the minimum util rate allowed
-    fn KINK_UTIL_MIN(self: @T) -> u128;
+    fn KINK_UTIL_MIN(self: @T) -> u256;
 
     /// # Returns the maximum util rate allowed
-    fn KINK_UTIL_MAX(self: @T) -> u128;
+    fn KINK_UTIL_MAX(self: @T) -> u256;
 
     /// # Returns the maximum ink multiplier allowed
-    fn KINK_MULTIPLIER_MAX(self: @T) -> u128;
+    fn KINK_MULTIPLIER_MAX(self: @T) -> u256;
 
     /// # Return Seconds per year not taking into account leap years
-    fn SECONDS_PER_YEAR(self: @T) -> u128;
+    fn SECONDS_PER_YEAR(self: @T) -> u256;
 
     /// The current reserve factor, which gets minted to the DAO Reserves (if > 0)
     ///
     /// # Returns
     /// The percentage of reserves the protocol keeps from borrows
-    fn reserve_factor(self: @T) -> u128;
+    fn reserve_factor(self: @T) -> u256;
 
     /// We store the interest rate model as a struct which has the base, slope and kink
     ///
@@ -194,7 +194,7 @@ pub trait IBorrowable<T> {
     ///
     /// # Arguments
     /// * `new_reserve_factor` - The new reserve factor percentage
-    fn set_reserve_factor(ref self: T, new_reserve_factor: u128);
+    fn set_reserve_factor(ref self: T, new_reserve_factor: u256);
 
     /// Setter for the interest rate model for this pool for this pool for this pool for this pool
     ///
@@ -206,7 +206,7 @@ pub trait IBorrowable<T> {
     /// * `multiplier` - The new annualized slope
     /// * `kink_muliplier` - The kink multiplier when the util reaches the kink
     /// * `kink` - The point at which util increases steeply
-    fn set_interest_rate_model(ref self: T, base_rate: u128, multiplier: u128, kink_muliplier: u128, kink: u128);
+    fn set_interest_rate_model(ref self: T, base_rate: u256, multiplier: u256, kink_muliplier: u256, kink: u256);
 
     /// Setter for the pillars of creation contract, allowed to be 0
     ///
@@ -223,11 +223,11 @@ pub trait IBorrowable<T> {
 
     /// Uses borrow indices
     /// Returns the latest total borrows (with interest accrued)
-    fn total_borrows(self: @T) -> u128;
+    fn total_borrows(self: @T) -> u256;
 
     /// Uses borrow indices
     /// Returns the latest borrow index (with interest accrued)
-    fn borrow_index(self: @T) -> u128;
+    fn borrow_index(self: @T) -> u256;
 
     /// Uses borrow indices
     /// Returns the timestamp of the last accrual
@@ -236,17 +236,17 @@ pub trait IBorrowable<T> {
     /// Uses borrow indices
     /// # Returns
     /// * The current utilization rate
-    fn utilization_rate(self: @T) -> u128;
+    fn utilization_rate(self: @T) -> u256;
 
     /// Uses borrow indices
     /// # Returns
     /// * The latest borrow rate per second (note: not annualized)
-    fn borrow_rate(self: @T) -> u128;
+    fn borrow_rate(self: @T) -> u256;
 
     /// Uses borrow indices
     /// # Returns
     /// * The current supply rate for lenders, without taking into account strategy/rewards
-    fn supply_rate(self: @T) -> u128;
+    fn supply_rate(self: @T) -> u256;
 
     /// Uses borrow indices
     /// Reads from the BorrowSnapshot struct and uses the borrow indices to calculate
@@ -258,17 +258,17 @@ pub trait IBorrowable<T> {
     /// # Returns
     /// * The borrower's principal (ie the borrowed amount without interest rate)
     /// * The borrower's borrow balance (principal with interests)
-    fn get_borrow_balance(self: @T, borrower: ContractAddress) -> (u128, u128);
+    fn get_borrow_balance(self: @T, borrower: ContractAddress) -> (u256, u256);
 
     /// # Returns
     /// * The price of the stablecoin in USD
-    fn get_usd_price(self: @T) -> u128;
+    fn get_usd_price(self: @T) -> u256;
 
     /// # Returns
     /// * The lender's CygUSD balance
     /// * The lender's USDC balance
     /// * The lender's position in USD (uses pragma to price USDC)
-    fn get_lender_position(self: @T, lender: ContractAddress) -> (u128, u128, u128);
+    fn get_lender_position(self: @T, lender: ContractAddress) -> (u256, u256, u256);
 
     /// Accrues interest for all borrowers, increasing `total_borrows` and storing the latest `borrow_rate`
     fn accrue_interest(ref self: T);
@@ -307,8 +307,8 @@ pub trait IBorrowable<T> {
     /// * `borrow_amount` - The amount of stablecoins to borrow
     /// * `calldata` - Calldata passed for leverage/flash loans
     fn borrow(
-        ref self: T, borrower: ContractAddress, receiver: ContractAddress, borrow_amount: u128, calldata: Array<felt252>
-    ) -> u128;
+        ref self: T, borrower: ContractAddress, receiver: ContractAddress, borrow_amount: u256, calldata: Array<felt252>
+    ) -> u256;
 
     /// Main function to liquidate or flash liquidate a borrower.
     /// This function should be called from a periphery contract only
@@ -322,6 +322,6 @@ pub trait IBorrowable<T> {
     /// * `repay_amount` - The USD amount being repaid
     /// * `calldata` - Calldata passed for flash liquidating
     fn liquidate(
-        ref self: T, borrower: ContractAddress, receiver: ContractAddress, repay_amount: u128, calldata: Array<felt252>
-    ) -> u128;
+        ref self: T, borrower: ContractAddress, receiver: ContractAddress, repay_amount: u256, calldata: Array<felt252>
+    ) -> u256;
 }

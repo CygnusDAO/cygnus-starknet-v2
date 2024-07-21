@@ -35,8 +35,18 @@
 //      LENDING POOL FACTORY V1 - `Hangar18`                                                           
 //  ═══════════════════════════════════════════════════════════════════════════════════════════════════════════  
 
+//! # Hangar18
+//!
+//! Factory-like contract for CygnusDAO which deploys all borrow/collateral contracts in this chain. There
+//! is only 1 factory contract per chain along with multiple pairs of `orbiters`.
+//!
+//! Orbiters are the collateral and borrow deployer contracts which are not part of the core contracts, 
+//! but instead are in charge of deploying the arms of core contracts with each other's addresses 
+//! (borrow orbiter deploys the borrow arm with the collateral address, and vice versa).
+//!
+//! Orbiters = Strategies for the underlying assets.
 #[starknet::contract]
-mod Hangar18 {
+pub(crate) mod Hangar18 {
     use core::num::traits::Zero;
     /// ═══════════════════════════════════════════════════════════════════════════════════════════════════════
     ///     1. IMPORTS
@@ -44,7 +54,7 @@ mod Hangar18 {
 
     use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
     use cygnus::collateral::{ICollateralDispatcher, ICollateralDispatcherTrait};
-    use cygnus::dao_reserves::{ICygnusDAOReservesDispatcher, ICygnusDAOReservesDispatcherTrait};
+    use cygnus::dao::{ICygnusDAOReservesDispatcher, ICygnusDAOReservesDispatcherTrait};
 
     /// Errors
     use cygnus::hangar18::errors::{
@@ -59,9 +69,9 @@ mod Hangar18 {
     };
 
     use cygnus::hangar18::interface::IHangar18;
-    use cygnus::nebula_registry::{INebulaRegistryDispatcher, INebulaRegistryDispatcherTrait};
     use cygnus::orbiters::albireo::{IAlbireoDispatcher, IAlbireoDispatcherTrait};
     use cygnus::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
+    use cygnus::registry::{INebulaRegistryDispatcher, INebulaRegistryDispatcherTrait};
     use cygnus::types::orbiter::{Orbiter};
     use cygnus::types::shuttle::{Shuttle};
     use cygnus::utils::math::MathLib::MathLibTrait;
@@ -94,7 +104,7 @@ mod Hangar18 {
     struct Storage {
         admin: ContractAddress,
         pending_admin: ContractAddress,
-        oracle_registry: INebulaRegistryDispatcher,
+        nebula_registry: INebulaRegistryDispatcher,
         dao_reserves: ICygnusDAOReservesDispatcher,
         total_orbiters: u32,
         total_shuttles: u32,
@@ -107,10 +117,10 @@ mod Hangar18 {
         cygnus_pillars: ContractAddress
     }
 
-    /// @notice Address of native token (ie. WETH) on Starknet
+    /// Address of native token (ie. WETH) on Starknet
     const WETH_ADDRESS: felt252 = 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
 
-    /// @notice Address of USDC on Starknet
+    /// Address of USDC on Starknet
     const USDC_ADDRESS: felt252 = 0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8;
 
     /// ═══════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -118,10 +128,10 @@ mod Hangar18 {
     /// ═══════════════════════════════════════════════════════════════════════════════════════════════════════
 
     #[constructor]
-    fn constructor(ref self: ContractState, admin: ContractAddress, oracle_registry: INebulaRegistryDispatcher) {
+    fn constructor(ref self: ContractState, admin: ContractAddress, nebula_registry: INebulaRegistryDispatcher) {
         // Admin and registry
         self.admin.write(admin);
-        self.oracle_registry.write(oracle_registry);
+        self.nebula_registry.write(nebula_registry);
 
         // Address of native (ie WETH)
         self.native_token.write(WETH_ADDRESS.try_into().unwrap());
@@ -166,8 +176,8 @@ mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn oracle_registry(self: @ContractState) -> ContractAddress {
-            self.oracle_registry.read().contract_address
+        fn nebula_registry(self: @ContractState) -> ContractAddress {
+            self.nebula_registry.read().contract_address
         }
 
         /// # Implementation
@@ -182,7 +192,8 @@ mod Hangar18 {
             self.usd.read()
         }
 
-        /// @inheritdoc IHangar18
+        /// # Implementation
+        /// * IHangar18
         fn native_token(self: @ContractState) -> ContractAddress {
             self.native_token.read()
         }
@@ -241,7 +252,7 @@ mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn borrowable_tvl_usd(self: @ContractState, shuttle_id: u32) -> u128 {
+        fn borrowable_tvl_usd(self: @ContractState, shuttle_id: u32) -> u256 {
             /// Borrowable contract of this shuttle
             let borrowable = self.all_shuttles.read(shuttle_id).borrowable;
 
@@ -256,7 +267,7 @@ mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn collateral_tvl_usd(self: @ContractState, shuttle_id: u32) -> u128 {
+        fn collateral_tvl_usd(self: @ContractState, shuttle_id: u32) -> u256 {
             /// Collateral contract of this shuttle
             let collateral = self.all_shuttles.read(shuttle_id).collateral;
 
@@ -271,14 +282,14 @@ mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn shuttle_tvl_usd(self: @ContractState, shuttle_id: u32) -> u128 {
+        fn shuttle_tvl_usd(self: @ContractState, shuttle_id: u32) -> u256 {
             /// Borrowable TVL + Collateral TVL
             self.borrowable_tvl_usd(shuttle_id) + self.collateral_tvl_usd(shuttle_id)
         }
 
         /// # Implementation
         /// * IHangar18
-        fn all_borrowables_tvl(self: @ContractState) -> u128 {
+        fn all_borrowables_tvl(self: @ContractState) -> u256 {
             /// Get total shuttles and initialize length and tvl accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut length = 0;
@@ -298,7 +309,7 @@ mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn all_collaterals_tvl(self: @ContractState) -> u128 {
+        fn all_collaterals_tvl(self: @ContractState) -> u256 {
             /// Get total shuttles and initialize length and tvl accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut length = 0;
@@ -318,7 +329,7 @@ mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn cygnus_tvl_usd(self: @ContractState) -> u128 {
+        fn cygnus_tvl_usd(self: @ContractState) -> u256 {
             /// Get total shuttles and initialize length and tvl accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut length = 0;
@@ -343,7 +354,7 @@ mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn cygnus_total_borrows_usd(self: @ContractState) -> u128 {
+        fn cygnus_total_borrows_usd(self: @ContractState) -> u256 {
             /// Get total shuttles and initialize length and borrows accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut borrows = 0;
@@ -381,7 +392,8 @@ mod Hangar18 {
         /// # Security
         /// * Only-admin
         ///
-        /// # Implementation - IHangar18
+        /// # Implementation 
+        /// * IHangar18
         fn set_orbiter(
             ref self: ContractState, name: felt252, albireo_orbiter: IAlbireoDispatcher, deneb_orbiter: IDenebDispatcher
         ) {
@@ -455,7 +467,7 @@ mod Hangar18 {
 
             // 3. Get Oracle
             // Check the registry for the oracle for this LP
-            let oracle: ContractAddress = self.oracle_registry.read().get_lp_token_nebula_address(lp_token_pair);
+            let oracle: ContractAddress = self.nebula_registry.read().get_lp_token_nebula_address(lp_token_pair);
 
             /// # Error
             /// * `ORACLE_NOT_INITIALIZED` - Revert if we have no oracle for this LP
@@ -495,8 +507,7 @@ mod Hangar18 {
             // Increase unique shuttle id's
             self.total_shuttles.write(shuttle_id + 1);
 
-            /// # Event
-            /// * `NewShuttle`
+            // Emit `NewShuttle` event
             self.emit(NewShuttle { shuttle_id, borrowable, collateral });
 
             // Return borrowable and collateral deployed
@@ -511,13 +522,13 @@ mod Hangar18 {
         /// # Implementation
         /// * IHangar18
         fn set_pending_admin(ref self: ContractState, new_pending_admin: ContractAddress) {
-            // Check sender is admin
+            /// Check sender is admin
             self._check_admin();
 
-            // Pending admin up until now
+            /// Pending admin up until now
             let old_pending_admin: ContractAddress = self.pending_admin.read();
 
-            // Store new pending admin
+            /// Store new pending admin
             self.pending_admin.write(new_pending_admin);
 
             /// # Event
@@ -642,7 +653,7 @@ mod Hangar18 {
         /// # Implementation
         /// * IHangar18
         fn set_cygnus_pillars(ref self: ContractState, new_cygnus_pillars: ContractAddress) {
-            // Check sender is admin
+            /// Check sender is admin
             self._check_admin();
 
             /// Pillars until now
@@ -670,7 +681,7 @@ mod Hangar18 {
         /// * Checks that caller is admin
         #[inline(always)]
         fn _check_admin(self: @ContractState) {
-            // Get admin address from the hangar18
+            /// Get admin address from the hangar18
             let admin = self.admin.read();
 
             /// # Error

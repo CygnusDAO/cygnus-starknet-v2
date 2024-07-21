@@ -17,7 +17,7 @@ pub trait ICollateral<T> {
     ///                                          1. ERC20
     ///--------------------------------------------------------------------------------------------------------
 
-    /// Open zeppeplin's implementation of erc20 with u128
+    /// Open zeppeplin's implementation of erc20 with u256
     /// https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/token/erc20/erc20.cairo
     ///
     /// commit-hash: 841a073
@@ -32,40 +32,40 @@ pub trait ICollateral<T> {
     fn decimals(self: @T) -> u8;
 
     /// Returns the amount of tokens owned by `account`.
-    fn balance_of(self: @T, account: ContractAddress) -> u128;
-    fn balanceOf(self: @T, account: ContractAddress) -> u128;
+    fn balance_of(self: @T, account: ContractAddress) -> u256;
+    fn balanceOf(self: @T, account: ContractAddress) -> u256;
 
     /// Returns the value of tokens in existence.
-    fn total_supply(self: @T) -> u128;
-    fn totalSupply(self: @T) -> u128;
+    fn total_supply(self: @T) -> u256;
+    fn totalSupply(self: @T) -> u256;
 
     /// Returns the remaining number of tokens that `spender` is allowed to spend on behalf of `owner` 
     /// through `transfer_from`.
     /// This is zero by default. This value changes when `approve` or `transfer_from` are called.
-    fn allowance(self: @T, owner: ContractAddress, spender: ContractAddress) -> u128;
+    fn allowance(self: @T, owner: ContractAddress, spender: ContractAddress) -> u256;
 
     /// Sets `amount` as the allowance of `spender` over the caller’s tokens.
-    fn approve(ref self: T, spender: ContractAddress, amount: u128) -> bool;
+    fn approve(ref self: T, spender: ContractAddress, amount: u256) -> bool;
 
     /// Moves `amount` tokens from the caller's token balance to `to`.
     /// Emits a `Transfer` event.
-    fn transfer(ref self: T, recipient: ContractAddress, amount: u128) -> bool;
+    fn transfer(ref self: T, recipient: ContractAddress, amount: u256) -> bool;
 
     /// Moves `amount` tokens from `from` to `to` using the allowance mechanism.
     /// `amount` is then deducted from the caller's allowance.
     /// Emits a `Transfer` event.
-    fn transfer_from(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u128) -> bool;
-    fn transferFrom(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u128) -> bool;
+    fn transfer_from(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
+    fn transferFrom(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     /// Increases the allowance granted from the caller to `spender` by `added_value`.
     /// Emits an `Approval` event indicating the updated allowance.
-    fn increase_allowance(ref self: T, spender: ContractAddress, added_value: u128) -> bool;
-    fn increaseAllowance(ref self: T, spender: ContractAddress, added_value: u128) -> bool;
+    fn increase_allowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
+    fn increaseAllowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
 
     /// Decreases the allowance granted from the caller to `spender` by `subtracted_value`.
     /// Emits an `Approval` event indicating the updated allowance.
-    fn decrease_allowance(ref self: T, spender: ContractAddress, subtracted_value: u128) -> bool;
-    fn decreaseAllowance(ref self: T, spender: ContractAddress, subtracted_value: u128) -> bool;
+    fn decrease_allowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
+    fn decreaseAllowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
 
     ///--------------------------------------------------------------------------------------------------------
     ///                                          2. TERMINAL
@@ -102,14 +102,14 @@ pub trait ICollateral<T> {
     fn shuttle_id(self: @T) -> u32;
 
     /// # Returns the total balance of the underlying deposited in the strategy
-    fn total_balance(self: @T) -> u128;
+    fn total_balance(self: @T) -> u256;
 
     /// Returns the total LP assets held by the vault (ie. total_balance)
-    fn total_assets(self: @T) -> u128;
+    fn total_assets(self: @T) -> u256;
 
     /// Returns the exchange rate between 1 unit of CygLP shares to assets. IE. How much LP
     /// can be redeemed by redeeming 1 unit of CygLP shares. It should never be below 1e18.
-    fn exchange_rate(self: @T) -> u128;
+    fn exchange_rate(self: @T) -> u256;
 
     /// Deposits underlying assets in the pool
     ///
@@ -122,7 +122,7 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of shares minted
-    fn deposit(ref self: T, assets: u128, recipient: ContractAddress) -> u128;
+    fn deposit(ref self: T, assets: u256, recipient: ContractAddress) -> u256;
 
 
     /// Redeems CygUSD for USDC Tokens
@@ -137,7 +137,7 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of assets withdrawn
-    fn redeem(ref self: T, shares: u128, recipient: ContractAddress, owner: ContractAddress) -> u128;
+    fn redeem(ref self: T, shares: u256, recipient: ContractAddress, owner: ContractAddress) -> u256;
 
     /// Force sync our balance with the total deposited in the strategy
     ///
@@ -150,28 +150,28 @@ pub trait ICollateral<T> {
     ///--------------------------------------------------------------------------------------------------------
 
     /// # Returns the minimum debt ratio allowed
-    fn DEBT_RATIO_MIN(self: @T) -> u128;
+    fn DEBT_RATIO_MIN(self: @T) -> u256;
 
     /// # Returns the maximum debt ratio allowed
-    fn DEBT_RATIO_MAX(self: @T) -> u128;
+    fn DEBT_RATIO_MAX(self: @T) -> u256;
 
     /// # Returns the maximum liquidation incentive allowed
-    fn LIQUIDATION_INCENTIVE_MAX(self: @T) -> u128;
+    fn LIQUIDATION_INCENTIVE_MAX(self: @T) -> u256;
 
     /// # Returns the minimum liquidation incentive allowed
-    fn LIQUIDATION_INCENTIVE_MIN(self: @T) -> u128;
+    fn LIQUIDATION_INCENTIVE_MIN(self: @T) -> u256;
 
     /// # Returns the maximum liquidation fee allowed
-    fn LIQUIDATION_FEE_MAX(self: @T) -> u128;
+    fn LIQUIDATION_FEE_MAX(self: @T) -> u256;
 
     /// # Returns the current pool's debt ratio
-    fn debt_ratio(self: @T) -> u128;
+    fn debt_ratio(self: @T) -> u256;
 
     /// # Returns the current pool's liquidation fee
-    fn liquidation_fee(self: @T) -> u128;
+    fn liquidation_fee(self: @T) -> u256;
 
     /// # Returns the current pool's liquidation incentive
-    fn liquidation_incentive(self: @T) -> u128;
+    fn liquidation_incentive(self: @T) -> u256;
 
     /// Sets the borrowable during deployment. Can only be set once (does address zero check).
     ///
@@ -189,7 +189,7 @@ pub trait ICollateral<T> {
     ///
     /// # Arguments
     /// * `new_liq_fee` - The new liquidation fee
-    fn set_liquidation_fee(ref self: T, new_liq_fee: u128);
+    fn set_liquidation_fee(ref self: T, new_liq_fee: u256);
 
     /// Sets liquidation incentive
     ///
@@ -198,7 +198,7 @@ pub trait ICollateral<T> {
     ///
     /// # Arguments
     /// * `incentive` - The new liquidation incentive
-    fn set_liquidation_incentive(ref self: T, new_incentive: u128);
+    fn set_liquidation_incentive(ref self: T, new_incentive: u256);
 
     /// Sets a new debt ratio
     ///
@@ -207,7 +207,7 @@ pub trait ICollateral<T> {
     ///
     /// # Arguments
     /// * `new_ratio` - The new debt ratio
-    fn set_debt_ratio(ref self: T, new_ratio: u128);
+    fn set_debt_ratio(ref self: T, new_ratio: u256);
 
     ///--------------------------------------------------------------------------------------------------------
     ///                                          4. MODEL
@@ -221,7 +221,7 @@ pub trait ICollateral<T> {
     ///
     /// # Returns 
     /// * Whether or not `borrower` can borrow `amount`
-    fn can_borrow(self: @T, borrower: ContractAddress, amount: u128) -> bool;
+    fn can_borrow(self: @T, borrower: ContractAddress, amount: u256) -> bool;
 
     /// Checks whether or not a borrower can redeem a certain amount of CygLP
     ///
@@ -232,7 +232,7 @@ pub trait ICollateral<T> {
     /// # Returns
     /// * Whether or not the borrower can withdraw 'amount' of CygLP. If false then it means withdrawing
     ///   this amount of CygLP would put user in shortfall and withdrawing this would cause the tx to revert
-    fn can_redeem(self: @T, borrower: ContractAddress, amount: u128) -> bool;
+    fn can_redeem(self: @T, borrower: ContractAddress, amount: u256) -> bool;
 
     /// Checks a borrower's current liquidity and shortfall. 
     /// 
@@ -242,11 +242,11 @@ pub trait ICollateral<T> {
     /// # Returns
     /// * The maximum amount of USDC that the `borrower` can borrow (if shortfall then this == 0)
     /// * The current shortfall of USDC (if liquidity then this == 0)
-    fn get_account_liquidity(self: @T, borrower: ContractAddress) -> (u128, u128);
+    fn get_account_liquidity(self: @T, borrower: ContractAddress) -> (u256, u256);
 
     /// # Returns
     /// * The price of the underlying LP Token, denominated in the borrowable`s underlying
-    fn get_lp_token_price(self: @T) -> u128;
+    fn get_lp_token_price(self: @T) -> u256;
 
     /// Quick check to see borrower`s position
     ///
@@ -257,7 +257,7 @@ pub trait ICollateral<T> {
     /// * The borrower's position in LPs
     /// * The borrower's position in USD
     /// * The borrower's health (0.5e18 = 50%, liquidatable at 100% ie 1e18)
-    fn get_borrower_position(self: @T, borrower: ContractAddress) -> (u128, u128, u128);
+    fn get_borrower_position(self: @T, borrower: ContractAddress) -> (u256, u256, u256);
 
     ///--------------------------------------------------------------------------------------------------------
     ///                                          5. COLLATERAL
@@ -277,7 +277,7 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of CygLP seized
-    fn seize_cyg_lp(ref self: T, liquidator: ContractAddress, borrower: ContractAddress, repay_amount: u128) -> u128;
+    fn seize_cyg_lp(ref self: T, liquidator: ContractAddress, borrower: ContractAddress, repay_amount: u256) -> u256;
 
     /// Flash redeems LP from the vault and sends it to `redeemer`, expecting an equivalent amount of CygLP to be received
     /// by the end of the function.
@@ -292,6 +292,6 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of USDC received (if any)
-    fn flash_redeem(ref self: T, redeemer: ContractAddress, redeem_amount: u128, calldata: Array<felt252>) -> u128;
+    fn flash_redeem(ref self: T, redeemer: ContractAddress, redeem_amount: u256, calldata: Array<felt252>) -> u256;
 }
 

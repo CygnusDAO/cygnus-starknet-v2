@@ -4,7 +4,7 @@ pub mod MathLib {
     use core::integer::{u256_wide_mul, u512_safe_div_rem_by_u256, u256_sqrt};
 
     /// Constants
-    const WAD: u128 = 1_000000000_000000000;
+    const WAD: u256 = 1_000000000_000000000;
 
     /// Trait
     pub trait MathLibTrait<T> {
@@ -28,9 +28,6 @@ pub mod MathLib {
         /// @dev Equivalent to `(x * WAD) / y` rounded up.
         fn div_wad_up(self: @T, y: T) -> T;
 
-        /// @dev Geometric mean
-        fn gm(self: @T, y: T) -> T;
-
         /// @dev Raises self to the power of n
         fn pow(self: @T, n: T) -> T;
     }
@@ -39,58 +36,47 @@ pub mod MathLib {
     ///                                 IMPLEMENTATION
     /// ------------------------------------------------------------------------------------
 
-    pub impl MathLibImpl of MathLibTrait<u128> {
-        /// @inheritdoc FixedPointMathLibTrait
-        fn full_mul_div(self: @u128, y: u128, d: u128) -> u128 {
-            mul_div(*self, y, d, false)
+    pub impl MathLibImpl of MathLibTrait<u256> {
+        /// # Implementation
+        /// * MathLibTrait
+        fn full_mul_div(self: @u256, y: u256, d: u256) -> u256 {
+            mul_div(*self, y, d)
         }
 
-        /// @inheritdoc FixedPointMathLibTrait
-        fn full_mul_div_up(self: @u128, y: u128, d: u128) -> u128 {
-            mul_div(*self, y, d, true)
+        /// # Implementation
+        /// * MathLibTrait
+        fn full_mul_div_up(self: @u256, y: u256, d: u256) -> u256 {
+            mul_div(*self, y, d)
         }
 
-        /// @inheritdoc FixedPointMathLibTrait
-        fn div_wad(self: @u128, y: u128) -> u128 {
-            mul_div(*self, WAD, y, false)
+        /// # Implementation
+        /// * MathLibTrait
+        fn div_wad(self: @u256, y: u256) -> u256 {
+            mul_div(*self, WAD, y)
         }
 
-        /// @inheritdoc FixedPointMathLibTrait
-        fn div_wad_up(self: @u128, y: u128) -> u128 {
-            mul_div(*self, WAD, y, true)
+        /// # Implementation
+        /// * MathLibTrait
+        fn div_wad_up(self: @u256, y: u256) -> u256 {
+            mul_div(*self, WAD, y)
         }
 
-        /// @inheritdoc FixedPointMathLibTrait
-        fn mul_wad(self: @u128, y: u128) -> u128 {
-            mul_div(*self, y, WAD, false)
+        /// # Implementation
+        /// * MathLibTrait
+        fn mul_wad(self: @u256, y: u256) -> u256 {
+            mul_div(*self, y, WAD)
         }
 
-        /// @inheritdoc FixedPointMathLibTrait
-        fn mul_wad_up(self: @u128, y: u128) -> u128 {
-            mul_div(*self, y, WAD, true)
+        /// # Implementation
+        /// * MathLibTrait
+        fn mul_wad_up(self: @u256, y: u256) -> u256 {
+            mul_div(*self, y, WAD)
         }
 
-        fn gm(self: @u128, y: u128) -> u128 {
-            let _x = u256 { low: *self, high: 0 };
-            let _y = u256 { low: y, high: 0 };
-            gm(_x, _y)
-        }
-
-        /// Raise a number to a power, computes x^n.
-        /// * `x` - The number to raise.
-        /// * `n` - The exponent.
-        /// # Returns
-        /// * `u256` - The result of x raised to the power of n.
-        fn pow(self: @u128, n: u128) -> u128 {
-            if n == 0 {
-                1
-            } else if n == 1 {
-                *self
-            } else if (n & 1) == 1 {
-                *self * pow(*self * *self, n / 2)
-            } else {
-                pow(*self * *self, n / 2)
-            }
+        /// # Implementation
+        /// * MathLibTrait
+        fn pow(self: @u256, n: u256) -> u256 {
+            pow256(*self, n)
         }
     }
 
@@ -98,50 +84,32 @@ pub mod MathLib {
     ///                                 LOGIC
     /// ------------------------------------------------------------------------------------
 
-    fn gm(x: u256, y: u256) -> u128 {
-        u256_sqrt(x * y)
-    }
-
     /// Raise a number to a power, computes x^n.
     /// * `x` - The number to raise.
     /// * `n` - The exponent.
     /// # Returns
     /// * `u256` - The result of x raised to the power of n.
-    fn pow(x: u128, n: u128) -> u128 {
+    fn pow256(x: u256, n: u256) -> u256 {
         if n == 0 {
             1
         } else if n == 1 {
             x
         } else if (n & 1) == 1 {
-            x * pow(x * x, n / 2)
+            x * pow256(x * x, n / 2)
         } else {
-            pow(x * x, n / 2)
+            pow256(x * x, n / 2)
         }
     }
 
-    /// From Satoru: https://github.com/keep-starknet-strange/satoru/blob/main/src/utils/precision.cairo
-    ///
-    /// Apply multiplication then division to value with a roundup.
+    /// Apply multiplication then division to value.
     /// # Arguments
     /// * `value` - The value muldiv is applied to.
     /// * `numerator` - The numerator that multiplies value.
     /// * `divisor` - The denominator that divides value.
-    fn mul_div(value: u128, numerator: u128, denominator: u128, roundup_magnitude: bool) -> u128 {
-        let value = u256 { low: value, high: 0 };
-        let numerator = u256 { low: numerator, high: 0 };
-        let denominator = u256 { low: denominator, high: 0 };
+    fn mul_div(value: u256, numerator: u256, denominator: u256) -> u256 {
         let product = u256_wide_mul(value, numerator);
-        let (q, r) = u512_safe_div_rem_by_u256(product, denominator.try_into().unwrap());
-        if roundup_magnitude && r > 0 {
-            let result = u256 { low: q.limb0, high: q.limb1 };
-            assert(
-                result != core::integer::BoundedInt::max() && q.limb1 == 0 && q.limb2 == 0 && q.limb3 == 0,
-                'MulDivOverflow'
-            );
-            q.limb0 + 1
-        } else {
-            assert(q.limb1 == 0 && q.limb2 == 0 && q.limb3 == 0, 'MulDivOverflow');
-            q.limb0
-        }
+        let (q, _) = u512_safe_div_rem_by_u256(product, denominator.try_into().unwrap());
+        assert(q.limb2 == 0 && q.limb3 == 0, 'MulDivOverflow');
+        u256 { low: q.limb0, high: q.limb1 }
     }
 }

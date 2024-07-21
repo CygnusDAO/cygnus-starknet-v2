@@ -34,10 +34,10 @@ pub trait ICygnusDAOReserves<T> {
     fn cygnus_x1_vault(self: @T) -> ContractAddress;
 
     /// # Returns the weight of reserves that gets sent to `cygnus_dao_safe`
-    fn dao_weight(self: @T) -> u128;
+    fn dao_weight(self: @T) -> u256;
 
     /// # Returns the weight of reserves that gets sent to `cygnus_x1_vault`
-    fn x1_vault_weight(self: @T) -> u128;
+    fn x1_vault_weight(self: @T) -> u256;
 
     /// # Returns the address of the CYG token on Starknet
     fn cyg_token(self: @T) -> ContractAddress;
@@ -61,10 +61,10 @@ pub trait ICygnusDAOReserves<T> {
     fn all_shuttles_length(self: @T) -> u32;
 
     /// Quick view of our token balance of CYG
-    fn cyg_token_balance(self: @T) -> u128;
+    fn cyg_token_balance(self: @T) -> u256;
 
     /// # Returns the pending x1 vault usd reserves
-    fn pending_x1_vault_usd(self: @T) -> u128;
+    fn pending_x1_vault_usd(self: @T) -> u256;
 
     /// -------------------------------------------------------------------------------------------------------
     ///                                      NON-CONSTANT FUNCTIONS
@@ -79,14 +79,14 @@ pub trait ICygnusDAOReserves<T> {
     /// # Returns
     /// * The amount of USDC sent to the vault
     /// * The amount of CygUSD sent to the safe
-    fn fund_x1_vault_usd(ref self: T, shuttle_id: u32) -> (u128, u128);
+    fn fund_x1_vault_usd(ref self: T, shuttle_id: u32) -> (u256, u256);
 
     /// # Redeems all reserves accrued across all lending pools and funds the x1 vault and dao safe
     ///
     /// # Returns
     /// * The amount of USDC sent to the vault
     /// * The amount of CygUSD sent to the safe
-    fn fund_x1_vault_usd_all(ref self: T) -> (u128, u128);
+    fn fund_x1_vault_usd_all(ref self: T) -> (u256, u256);
 
     /// Sends the CygLP received for `shuttle_id` from the liquidation fees to the dao safe
     ///
@@ -95,13 +95,13 @@ pub trait ICygnusDAOReserves<T> {
     ///
     /// # Returns
     /// * The amount of CygLP sent to the safe
-    fn fund_safe_cyg_lp(ref self: T, shuttle_id: u32) -> u128;
+    fn fund_safe_cyg_lp(ref self: T, shuttle_id: u32) -> u256;
 
     /// Sends all CygLP received from the liquidation fees to the dao safe
     ///
     /// # Returns
     /// * The amount of CygLP sent to the safe
-    fn fund_safe_cyg_lp_all(ref self: T) -> u128;
+    fn fund_safe_cyg_lp_all(ref self: T) -> u256;
 
     /// Adds shuttle to DAO reserves
     ///
@@ -123,7 +123,7 @@ pub trait ICygnusDAOReserves<T> {
     ///
     /// # Arguments
     /// * `new_weight` - The new weight that is sent to the X1 vault from all collected reserves
-    fn set_x1_vault_weight(ref self: T, new_weight: u128);
+    fn set_x1_vault_weight(ref self: T, new_weight: u256);
 
     /// Admin sweeps a token that was sent here by mistake (cant sweep CYG). Uses `amount` to aovid the whole
     /// balance_of/balanceOf and just use `transfer`
@@ -144,7 +144,7 @@ pub trait ICygnusDAOReserves<T> {
     /// # Arguments
     /// * `amount` - The amount of CYG to recover
     /// * `to` - The address to send the CYG to
-    fn claim_cyg_token_dao(ref self: T, amount: u128, to: ContractAddress);
+    fn claim_cyg_token_dao(ref self: T, amount: u256, to: ContractAddress);
 
     /// Admin switches on/off the private banker feature, allowing anyone to fund the x1 vault
     ///
