@@ -16,6 +16,7 @@ keywords = ["cygnusdao", "starknet", "cairo", "contracts", "defi"]
 [dependencies]
 starknet = "2.6.4"
 erc6909 = { git = "https://github.com/swan-of-bodom/erc6909-starknet" }
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.14.0" }
 
 [dev-dependencies]
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry.git", tag = "v0.26.0" }

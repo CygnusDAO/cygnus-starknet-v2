@@ -1,5 +1,3 @@
-// Borrowable deployer
+// Pool deployers
 pub mod albireo;
-
-// Collateral deployer
 pub mod deneb;

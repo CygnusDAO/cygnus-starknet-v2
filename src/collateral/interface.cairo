@@ -14,60 +14,6 @@ use starknet::ContractAddress;
 #[starknet::interface]
 pub trait ICollateral<T> {
     ///--------------------------------------------------------------------------------------------------------
-    ///                                          1. ERC20
-    ///--------------------------------------------------------------------------------------------------------
-
-    /// Open zeppeplin's implementation of erc20 with u256
-    /// https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/token/erc20/erc20.cairo
-    ///
-    /// commit-hash: 841a073
-
-    /// Returns the name of the token.
-    fn name(self: @T) -> felt252;
-
-    /// Returns the ticker symbol of the token, usually a shorter version of the name.
-    fn symbol(self: @T) -> felt252;
-
-    /// Returns the number of decimals used to get its user representation.
-    fn decimals(self: @T) -> u8;
-
-    /// Returns the amount of tokens owned by `account`.
-    fn balance_of(self: @T, account: ContractAddress) -> u256;
-    fn balanceOf(self: @T, account: ContractAddress) -> u256;
-
-    /// Returns the value of tokens in existence.
-    fn total_supply(self: @T) -> u256;
-    fn totalSupply(self: @T) -> u256;
-
-    /// Returns the remaining number of tokens that `spender` is allowed to spend on behalf of `owner` 
-    /// through `transfer_from`.
-    /// This is zero by default. This value changes when `approve` or `transfer_from` are called.
-    fn allowance(self: @T, owner: ContractAddress, spender: ContractAddress) -> u256;
-
-    /// Sets `amount` as the allowance of `spender` over the caller’s tokens.
-    fn approve(ref self: T, spender: ContractAddress, amount: u256) -> bool;
-
-    /// Moves `amount` tokens from the caller's token balance to `to`.
-    /// Emits a `Transfer` event.
-    fn transfer(ref self: T, recipient: ContractAddress, amount: u256) -> bool;
-
-    /// Moves `amount` tokens from `from` to `to` using the allowance mechanism.
-    /// `amount` is then deducted from the caller's allowance.
-    /// Emits a `Transfer` event.
-    fn transfer_from(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
-    fn transferFrom(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
-
-    /// Increases the allowance granted from the caller to `spender` by `added_value`.
-    /// Emits an `Approval` event indicating the updated allowance.
-    fn increase_allowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
-    fn increaseAllowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
-
-    /// Decreases the allowance granted from the caller to `spender` by `subtracted_value`.
-    /// Emits an `Approval` event indicating the updated allowance.
-    fn decrease_allowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
-    fn decreaseAllowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
-
-    ///--------------------------------------------------------------------------------------------------------
     ///                                          2. TERMINAL
     ///--------------------------------------------------------------------------------------------------------
 
@@ -149,21 +95,6 @@ pub trait ICollateral<T> {
     ///                                          3. CONTROL
     ///--------------------------------------------------------------------------------------------------------
 
-    /// # Returns the minimum debt ratio allowed
-    fn DEBT_RATIO_MIN(self: @T) -> u256;
-
-    /// # Returns the maximum debt ratio allowed
-    fn DEBT_RATIO_MAX(self: @T) -> u256;
-
-    /// # Returns the maximum liquidation incentive allowed
-    fn LIQUIDATION_INCENTIVE_MAX(self: @T) -> u256;
-
-    /// # Returns the minimum liquidation incentive allowed
-    fn LIQUIDATION_INCENTIVE_MIN(self: @T) -> u256;
-
-    /// # Returns the maximum liquidation fee allowed
-    fn LIQUIDATION_FEE_MAX(self: @T) -> u256;
-
     /// # Returns the current pool's debt ratio
     fn debt_ratio(self: @T) -> u256;
 
@@ -181,33 +112,6 @@ pub trait ICollateral<T> {
     /// # Arguments
     /// * `borrowable` - The address of the borrowable
     fn set_borrowable(ref self: T, borrowable: IBorrowableDispatcher);
-
-    /// Sets liquidation fee 
-    ///
-    /// # Security 
-    /// * Only-admin 👽
-    ///
-    /// # Arguments
-    /// * `new_liq_fee` - The new liquidation fee
-    fn set_liquidation_fee(ref self: T, new_liq_fee: u256);
-
-    /// Sets liquidation incentive
-    ///
-    /// # Security 
-    /// * Only-admin 👽
-    ///
-    /// # Arguments
-    /// * `incentive` - The new liquidation incentive
-    fn set_liquidation_incentive(ref self: T, new_incentive: u256);
-
-    /// Sets a new debt ratio
-    ///
-    /// # Security
-    /// * Only-admin 👽
-    ///
-    /// # Arguments
-    /// * `new_ratio` - The new debt ratio
-    fn set_debt_ratio(ref self: T, new_ratio: u256);
 
     ///--------------------------------------------------------------------------------------------------------
     ///                                          4. MODEL

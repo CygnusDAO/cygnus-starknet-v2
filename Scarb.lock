@@ -6,6 +6,7 @@ name = "cygnus"
 version = "0.1.0"
 dependencies = [
  "erc6909",
+ "openzeppelin",
  "snforge_std",
 ]
 
