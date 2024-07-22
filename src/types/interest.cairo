@@ -1,15 +1,15 @@
 /// Interest Rate Model
 #[derive(Drop, starknet::Store, Serde)]
 pub struct InterestRateModel {
-    base_rate_per_second: u64,
-    multiplier_per_second: u64,
-    jump_multiplier_per_second: u64,
-    kink: u64
+    pub base_rate_per_second: u64,
+    pub multiplier_per_second: u64,
+    pub jump_multiplier_per_second: u64,
+    pub kink: u64
 }
 
 /// Borrow Snapshot of each borrower across all pools
 #[derive(Drop, Copy, starknet::Store, Serde)]
 pub struct BorrowSnapshot {
-    principal: u128,
-    interest_index: u128,
+    pub principal: u256,
+    pub interest_index: u256,
 }
