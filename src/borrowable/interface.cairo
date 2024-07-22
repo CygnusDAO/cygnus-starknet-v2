@@ -8,66 +8,11 @@ use cygnus::types::interest::{InterestRateModel, BorrowSnapshot};
 /// # Author
 /// * CygnusDAO
 use starknet::ContractAddress;
-/// use cygnus::rewarder::pillars::{IPillarsOfCreationDispatcher, IPillarsOfCreationDispatcherTrait};
 
 /// # Interface
 /// * `IBorrowable`
 #[starknet::interface]
 pub trait IBorrowable<T> {
-    /// --------------------------------------------------------------------------------------------------------
-    ///                                          1. ERC20
-    /// --------------------------------------------------------------------------------------------------------
-
-    /// Open zeppeplin's implementation of erc20 with u256
-    /// https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/token/erc20/erc20.cairo
-    ///
-    /// commit-hash: 841a073
-
-    /// Returns the name of the token.
-    fn name(self: @T) -> felt252;
-
-    /// Returns the ticker symbol of the token, usually a shorter version of the name.
-    fn symbol(self: @T) -> felt252;
-
-    /// Returns the number of decimals used to get its user representation.
-    fn decimals(self: @T) -> u8;
-
-    /// Returns the amount of tokens owned by `account`.
-    fn balance_of(self: @T, account: ContractAddress) -> u256;
-    fn balanceOf(self: @T, account: ContractAddress) -> u256;
-
-    /// Returns the value of tokens in existence.
-    fn total_supply(self: @T) -> u256;
-    fn totalSupply(self: @T) -> u256;
-
-    /// Returns the remaining number of tokens that `spender` is allowed to spend on behalf of `owner` 
-    /// through `transfer_from`.
-    /// This is zero by default. This value changes when `approve` or `transfer_from` are called.
-    fn allowance(self: @T, owner: ContractAddress, spender: ContractAddress) -> u256;
-
-    /// Sets `amount` as the allowance of `spender` over the caller’s tokens.
-    fn approve(ref self: T, spender: ContractAddress, amount: u256) -> bool;
-
-    /// Moves `amount` tokens from the caller's token balance to `to`.
-    /// Emits a `Transfer` event.
-    fn transfer(ref self: T, recipient: ContractAddress, amount: u256) -> bool;
-
-    /// Moves `amount` tokens from `from` to `to` using the allowance mechanism.
-    /// `amount` is then deducted from the caller's allowance.
-    /// Emits a `Transfer` event.
-    fn transfer_from(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
-    fn transferFrom(ref self: T, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
-
-    /// Increases the allowance granted from the caller to `spender` by `added_value`.
-    /// Emits an `Approval` event indicating the updated allowance.
-    fn increase_allowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
-    fn increaseAllowance(ref self: T, spender: ContractAddress, added_value: u256) -> bool;
-
-    /// Decreases the allowance granted from the caller to `spender` by `subtracted_value`.
-    /// Emits an `Approval` event indicating the updated allowance.
-    fn decrease_allowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
-    fn decreaseAllowance(ref self: T, spender: ContractAddress, subtracted_value: u256) -> bool;
-
     /// --------------------------------------------------------------------------------------------------------
     ///                                          2. TERMINAL
     /// --------------------------------------------------------------------------------------------------------
@@ -215,7 +160,7 @@ pub trait IBorrowable<T> {
     ///
     /// # Arguments
     /// * `new_pillars` - The new CYG rewarder
-    fn set_pillars_of_creation(ref self: T, new_pillars: ContractAddress); // TODO
+    fn set_pillars_of_creation(ref self: T, new_pillars: ContractAddress);
 
     /// --------------------------------------------------------------------------------------------------------
     ///                                          4. MODEL
@@ -284,12 +229,6 @@ pub trait IBorrowable<T> {
     /// # Arguments
     /// * `lender` - The address of the lender
     fn track_lender(ref self: T, lender: ContractAddress);
-
-    /// Total position IDs
-    fn all_positions_length(self: @T) -> u32;
-
-    /// Get address of position ID
-    fn all_positions(self: @T, position_id: u32) -> ContractAddress;
 
     /// --------------------------------------------------------------------------------------------------------
     ///                                          5. BORROWABLE
