@@ -1,1 +1,2 @@
-pub mod math;
+pub(crate) mod addresses;
+pub(crate) mod math;

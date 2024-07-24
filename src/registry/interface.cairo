@@ -1,7 +1,7 @@
 use cygnus::types::nebula::LPInfo;
 use cygnus::types::registry::Nebula;
+use ekubo::types::keys::{PoolKey, PositionKey};
 use starknet::ContractAddress;
-//use array::ArrayTrait;
 
 /// Interface - Oracle Registry
 #[starknet::interface]
@@ -30,11 +30,11 @@ pub trait INebulaRegistry<T> {
     ///            This is only kept here for reporting purposes.
     ///
     /// # Arguments
-    /// * `lp_token_pair` - The address of the LP token
+    /// * `pool_key` - The address of the LP token
     ///
     /// # Returns
     /// * The price of the lp token (gets the nebula for the LP, and calls `lp_token_price_usd`)
-    fn get_lp_token_price_usd(self: @T, lp_token_pair: ContractAddress) -> u256;
+    fn get_nft_price_usd(self: @T, pool_key: PoolKey, position_key: PositionKey) -> u256;
 
     /// # Arguments
     /// * `nebula_address` - The address of the nebula implementation
@@ -44,32 +44,32 @@ pub trait INebulaRegistry<T> {
     fn get_nebula(self: @T, nebula_address: ContractAddress) -> Nebula;
 
     /// # Arguments
-    /// * `lp_token_pair` - The address of the LP token
+    /// * `pool_key` - The unique ekubo pool key
     ///
     /// # Returns
     /// * The nebula struct given an LP token pair (if we are tracking it)
-    fn get_lp_token_nebula(self: @T, lp_token_pair: ContractAddress) -> Nebula;
+    fn get_lp_token_nebula(self: @T, pool_key: PoolKey) -> Nebula;
 
     /// This is used by the factory to deploy pools as it's more gas efficient
     ///
     /// # Arguments
-    /// * `lp_token_pair` - The address of the LP token
+    /// * `pool_key` - The unique ekubo pool key
     ///
     /// # Returns
     /// * The nebula address given an LP Token pair
-    fn get_lp_token_nebula_address(self: @T, lp_token_pair: ContractAddress) -> ContractAddress;
+    fn get_lp_token_nebula_address(self: @T, pool_key: PoolKey) -> ContractAddress;
 
     /// Gets a quick overview of the LP Token
     ///
     /// # Arguments
-    /// * `lp_token_pair` - The address of the LP Token
+    /// * `pool_key` - The unique ekubo pool key
     ///
     /// # Returns
     /// * Array of all token addresses that compose the LP
     /// * Array of the reserves of each token in the LP
     /// * Array of decimals of each token in the LP
     /// * Array of prices of each token in the LP
-    fn get_lp_token_info(self: @T, lp_token_pair: ContractAddress) -> LPInfo;
+    fn get_lp_token_info(self: @T, pool_key: PoolKey) -> LPInfo;
 
     /// Array of nebulas
     ///
@@ -104,16 +104,11 @@ pub trait INebulaRegistry<T> {
     /// 
     /// # Arguments
     /// * `nebula_id` - The unique ID of the nebula where we are initializing the oracle
-    /// * `lp_token_pair` - The address of the LP Token
+    /// * `pool_key` - The unique ekubo pool key
     /// * `price_feeds` - Array of price feeds for each token in the LP
     /// * `is_override` - Whether we are overriding an already existing LP oracle for future pools.
     fn create_nebula_oracle(
-        ref self: T,
-        nebula_id: u32,
-        lp_token_pair: ContractAddress,
-        price_feed0: felt252,
-        price_feed1: felt252,
-        is_override: bool
+        ref self: T, nebula_id: u32, pool_key: PoolKey, price_feed0: felt252, price_feed1: felt252, is_override: bool
     );
 
     /// Sets a new pending admin, for them to accept and transfer ownership of this registry

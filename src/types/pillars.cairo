@@ -1,4 +1,4 @@
-use cygnus::types::i129::i129;
+use ekubo::types::i129::i129;
 use starknet::ContractAddress;
 
 /// Epoch Information on each epoch

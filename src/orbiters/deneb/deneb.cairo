@@ -9,6 +9,7 @@ mod Deneb {
     use cygnus::orbiters::deneb::IDeneb;
     use cygnus::terminal::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
     use cygnus::terminal::collateral::{ICollateralDispatcher, ICollateralDispatcherTrait};
+    use ekubo::types::keys::{PoolKey};
 
     /// # Libraries
     use poseidon::poseidon_hash_span;
@@ -49,7 +50,7 @@ mod Deneb {
         /// * IDeneb
         fn deploy_collateral(
             ref self: ContractState,
-            underlying: ContractAddress,
+            pool_key: PoolKey,
             borrowable: IBorrowableDispatcher,
             oracle: ContractAddress,
             shuttle_id: u32
@@ -61,10 +62,10 @@ mod Deneb {
             let class = self.collateral_class_hash.read();
 
             // 2. Salt of collateral is always: [lp_token, hangar18]
-            let salt = self.collateral_salt(underlying, factory);
+            let salt = self.collateral_salt(pool_key, factory, shuttle_id);
 
             // 3. Build constructor arguments
-            let calldata = self.c_calldata(factory, underlying, borrowable, oracle, shuttle_id);
+            let calldata = self.c_calldata(factory, pool_key, borrowable, oracle, shuttle_id);
 
             // 4. Deploy collateral
             let (contract_address, _) = deploy_syscall(class, salt, calldata, false).unwrap();
@@ -83,17 +84,18 @@ mod Deneb {
         /// The salt for deploying a new `Borrowable`
         ///
         /// # Arguments
-        /// * `underlying` - The address of the underlying LP
+        /// * `pool_key` - The Ekubo pool key
         /// * `sender` - The address of the msg.sender
         ///
         /// # Returns
         /// * The salt used to deploy the collateral
-        fn collateral_salt(self: @ContractState, underlying: ContractAddress, sender: ContractAddress,) -> felt252 {
+        fn collateral_salt(self: @ContractState, pool_key: PoolKey, sender: ContractAddress,) -> felt252 {
             /// Build salt for collateral with the arguments
             let mut data = array![];
 
             data.append('CYGNUS_COLLATERAL');
-            data.append(underlying.into());
+            data.append(pool_key.token0.into());
+            data.append(pool_key.token1.into());
             data.append(sender.into());
 
             // https://docs.starknet.io/documentation/architecture_and_concepts/Cryptography/hash-functions/
@@ -104,7 +106,7 @@ mod Deneb {
         ///
         /// # Arguments
         /// * `factory` - The address of hangar18
-        /// * `underlying` - The address of the underlying stablecoin
+        /// * `pool_key` - The Ekubo pool key
         /// * `borrowable` - The address of the borrowable contract
         /// * `oracle` - The address of the oracle for the collateral and collateral
         /// * `shuttle_id` - Unique lending pool ID, shared by the collateral
@@ -114,7 +116,7 @@ mod Deneb {
         fn c_calldata(
             self: @ContractState,
             factory: ContractAddress,
-            underlying: ContractAddress,
+            pool_key: PoolKey,
             borrowable: IBorrowableDispatcher,
             oracle: ContractAddress,
             shuttle_id: u32
@@ -123,7 +125,7 @@ mod Deneb {
             let mut constructor_calldata = array![];
 
             constructor_calldata.append(factory.into());
-            constructor_calldata.append(underlying.into());
+            constructor_calldata.append(pool_key.into());
             constructor_calldata.append(borrowable.contract_address.into());
             constructor_calldata.append(oracle.into());
             constructor_calldata.append(shuttle_id.into());

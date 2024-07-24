@@ -67,30 +67,30 @@ mod Collateral {
         underlying: ERC20ABIDispatcher,
         nebula: ICygnusNebulaDispatcher,
         shuttle_id: u32,
-        total_balance: u256,
+        total_balance: u128,
         pillars_of_creation: ContractAddress,
         interest_rate_model: InterestRateModel,
-        reserve_factor: u256,
+        reserve_factor: u128,
         borrow_balances: LegacyMap<ContractAddress, BorrowSnapshot>,
         last_accrual_timestamp: u64,
-        total_borrows: u256,
-        borrow_index: u256,
+        total_borrows: u128,
+        borrow_index: u128,
         zk_lend_market: IZKLendMarketDispatcher,
         zk_lend_usdc: ERC20ABIDispatcher,
     }
 
     /// The maximum possible base rate set by admin
-    const BASE_RATE_MAX: u256 = 100000000000000000; // 0.1e18 = 10%
+    const BASE_RATE_MAX: u128 = 100000000000000000; // 0.1e18 = 10%
     /// The minimum possible kink util rate
-    const KINK_UTIL_MIN: u256 = 700000000000000000; // 0.7e18 = 70%
+    const KINK_UTIL_MIN: u128 = 700000000000000000; // 0.7e18 = 70%
     /// The maximum possible kink util rate
-    const KINK_UTIL_MAX: u256 = 990000000000000000; // 0.99e18 = 99%
+    const KINK_UTIL_MAX: u128 = 990000000000000000; // 0.99e18 = 99%
     /// To calculate annual interest rates
-    const SECONDS_PER_YEAR: u256 = 31_536_000;
+    const SECONDS_PER_YEAR: u128 = 31_536_000;
     /// The maximum possible reserve factor set by admin
-    const RESERVE_FACTOR_MAX: u256 = 200000000000000000; // 0.2e18 = 20%
+    const RESERVE_FACTOR_MAX: u128 = 200000000000000000; // 0.2e18 = 20%
     /// The max kink multiplier
-    const KINK_MULTIPLIER_MAX: u256 = 40;
+    const KINK_MULTIPLIER_MAX: u128 = 40;
 
     /// ═══════════════════════════════════════════════════════════════════════════════════════════════════════
     ///     4. CONSTRUCTOR
@@ -150,20 +150,20 @@ mod Collateral {
 
         /// # Implementation
         /// * IBorrowable
-        fn total_balance(self: @ContractState) -> u256 {
+        fn total_balance(self: @ContractState) -> u128 {
             self.total_balance.read()
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn total_assets(self: @ContractState) -> u256 {
+        fn total_assets(self: @ContractState) -> u128 {
             /// When called externally we always simulate accrual.
             self._total_assets(accrue: true)
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn exchange_rate(self: @ContractState) -> u256 {
+        fn exchange_rate(self: @ContractState) -> u128 {
             /// Get supply of CygUSD
             let supply = self.erc20.ERC20_total_supply.read();
 
@@ -184,7 +184,7 @@ mod Collateral {
         ///
         /// # Implementation
         /// * IBorrowable
-        fn deposit(ref self: ContractState, assets: u256, recipient: ContractAddress) -> u256 {
+        fn deposit(ref self: ContractState, assets: u128, recipient: ContractAddress) -> u128 {
             /// Locks, accrues and updates our balance
             self._lock_accrue_update();
 
@@ -224,7 +224,7 @@ mod Collateral {
         ///
         /// # Implementation
         /// * IBorrowable
-        fn redeem(ref self: ContractState, shares: u256, recipient: ContractAddress, owner: ContractAddress) -> u256 {
+        fn redeem(ref self: ContractState, shares: u128, recipient: ContractAddress, owner: ContractAddress) -> u128 {
             /// Locks, accrues and updates our balance
             self._lock_accrue_update();
 
@@ -276,43 +276,43 @@ mod Collateral {
 
         /// # Implementation
         /// * IBorrowable
-        fn BASE_RATE_MAX(self: @ContractState) -> u256 {
+        fn BASE_RATE_MAX(self: @ContractState) -> u128 {
             BASE_RATE_MAX
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn RESERVE_FACTOR_MAX(self: @ContractState) -> u256 {
+        fn RESERVE_FACTOR_MAX(self: @ContractState) -> u128 {
             RESERVE_FACTOR_MAX
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn KINK_UTIL_MIN(self: @ContractState) -> u256 {
+        fn KINK_UTIL_MIN(self: @ContractState) -> u128 {
             KINK_UTIL_MIN
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn KINK_UTIL_MAX(self: @ContractState) -> u256 {
+        fn KINK_UTIL_MAX(self: @ContractState) -> u128 {
             KINK_UTIL_MAX
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn KINK_MULTIPLIER_MAX(self: @ContractState) -> u256 {
+        fn KINK_MULTIPLIER_MAX(self: @ContractState) -> u128 {
             KINK_MULTIPLIER_MAX
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn SECONDS_PER_YEAR(self: @ContractState) -> u256 {
+        fn SECONDS_PER_YEAR(self: @ContractState) -> u128 {
             SECONDS_PER_YEAR
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn reserve_factor(self: @ContractState) -> u256 {
+        fn reserve_factor(self: @ContractState) -> u128 {
             self.reserve_factor.read()
         }
 
@@ -336,7 +336,7 @@ mod Collateral {
         /// # Implementation
         /// * IBorrowable
         fn set_interest_rate_model(
-            ref self: ContractState, base_rate: u256, multiplier: u256, kink_muliplier: u256, kink: u256
+            ref self: ContractState, base_rate: u128, multiplier: u128, kink_muliplier: u128, kink: u128
         ) {
             // Check admin
             self._check_admin();
@@ -352,7 +352,7 @@ mod Collateral {
         ///
         /// # Implementation
         /// * IBorrowable
-        fn set_reserve_factor(ref self: ContractState, new_reserve_factor: u256) {
+        fn set_reserve_factor(ref self: ContractState, new_reserve_factor: u128) {
             // Check sender is admin
             self._check_admin();
 
@@ -402,7 +402,7 @@ mod Collateral {
         ///
         /// # Implmentation
         /// * IBorrowable
-        fn total_borrows(self: @ContractState) -> u256 {
+        fn total_borrows(self: @ContractState) -> u128 {
             // Get latest borrows from indices (simulates accrual)
             let (_, total_borrows, _, _, _) = self._borrow_indices();
 
@@ -413,7 +413,7 @@ mod Collateral {
         ///
         /// # Implmentation
         /// * IBorrowable
-        fn borrow_index(self: @ContractState) -> u256 {
+        fn borrow_index(self: @ContractState) -> u128 {
             // Get latest index from indices
             let (_, _, index, _, _) = self._borrow_indices();
 
@@ -432,7 +432,7 @@ mod Collateral {
         ///
         /// # Implementation
         /// * IBorrowable
-        fn utilization_rate(self: @ContractState) -> u256 {
+        fn utilization_rate(self: @ContractState) -> u128 {
             /// Get the latest borrow indices
             let (cash, borrows, _, _, _) = self._borrow_indices();
 
@@ -449,7 +449,7 @@ mod Collateral {
         ///
         /// # Implementation
         /// * IBorrowable
-        fn borrow_rate(self: @ContractState) -> u256 {
+        fn borrow_rate(self: @ContractState) -> u128 {
             // Get the current borrows with interest
             // Calculates the borrow rate with the stored borrows and simulate interest accrual
             // up to this point.
@@ -463,7 +463,7 @@ mod Collateral {
         ///
         /// # Implementation
         /// * IBorrowable
-        fn supply_rate(self: @ContractState) -> u256 {
+        fn supply_rate(self: @ContractState) -> u128 {
             // Get the current borrows with interest
             // Calculates the borrow rate with the stored borrows and simulate interest accrual
             // up to this point.
@@ -490,13 +490,13 @@ mod Collateral {
 
         /// # Implementation
         /// * IBorrowable
-        fn get_usd_price(self: @ContractState) -> u256 {
+        fn get_usd_price(self: @ContractState) -> u128 {
             self.nebula.read().denomination_token_price()
         }
 
         /// # Implementation
         /// * IBorrowable
-        fn get_lender_position(self: @ContractState, lender: ContractAddress) -> (u256, u256, u256) {
+        fn get_lender_position(self: @ContractState, lender: ContractAddress) -> (u128, u128, u128) {
             let cyg_usd_balance = self.erc20.ERC20_balances.read(lender);
             let underlying_balance = cyg_usd_balance.mul_wad(self.exchange_rate());
             let usd_balance = underlying_balance.mul_wad(self.get_usd_price());
@@ -508,7 +508,7 @@ mod Collateral {
         ///
         /// # Implementation
         /// * IBorrowable
-        fn get_borrow_balance(self: @ContractState, borrower: ContractAddress) -> (u256, u256) {
+        fn get_borrow_balance(self: @ContractState, borrower: ContractAddress) -> (u128, u128) {
             // Simulate accrue
             self._borrow_balance(borrower, accrue: true)
         }
@@ -553,9 +553,9 @@ mod Collateral {
             ref self: ContractState,
             borrower: ContractAddress,
             receiver: ContractAddress,
-            borrow_amount: u256,
+            borrow_amount: u128,
             calldata: Array<felt252>,
-        ) -> u256 {
+        ) -> u128 {
             /// Lock, accrue  and update
             self._lock_accrue_update();
 
@@ -645,9 +645,9 @@ mod Collateral {
             ref self: ContractState,
             borrower: ContractAddress,
             receiver: ContractAddress,
-            repay_amount: u256,
+            repay_amount: u128,
             calldata: Array<felt252>
-        ) -> u256 {
+        ) -> u128 {
             /// Lock, accrue  and update
             self._lock_accrue_update();
 
@@ -819,7 +819,7 @@ mod Collateral {
         ///
         /// # Returns
         /// * The total cash deposited in the strategy + the total borrows stored
-        fn _total_assets(self: @ContractState, accrue: bool) -> u256 {
+        fn _total_assets(self: @ContractState, accrue: bool) -> u128 {
             /// Check if we should simulate accrual using indices, avoid when called internally
             if (accrue) {
                 /// Total cash
@@ -842,7 +842,7 @@ mod Collateral {
         /// # Returns
         /// * The assets equivalent of shares
         #[inline(always)]
-        fn _convert_to_assets(self: @ContractState, shares: u256) -> u256 {
+        fn _convert_to_assets(self: @ContractState, shares: u128) -> u128 {
             // Gas savings
             let supply = self.erc20.ERC20_total_supply.read();
 
@@ -865,7 +865,7 @@ mod Collateral {
         /// # Returns
         /// * The shares equivalent of assets
         #[inline(always)]
-        fn _convert_to_shares(self: @ContractState, assets: u256) -> u256 {
+        fn _convert_to_shares(self: @ContractState, assets: u128) -> u128 {
             // Gas savings
             let supply = self.erc20.ERC20_total_supply.read();
 
@@ -912,7 +912,7 @@ mod Collateral {
         /// * `kink_multiplier` - The kink multiplier
         /// * `kink` - The point at which the borrow rate goes steep
         fn _interest_rate_model(
-            ref self: ContractState, base_rate: u256, multiplier: u256, kink_muliplier: u256, kink: u256
+            ref self: ContractState, base_rate: u128, multiplier: u128, kink_muliplier: u128, kink: u128
         ) {
             /// # Error
             /// * `INVALID_RANGE` - Avoid if not within range
@@ -957,7 +957,7 @@ mod Collateral {
         ///
         /// # Returns
         /// * The utilization rate of the pool (ie. borrows / (cash + borrows))
-        fn _utilization_rate(self: @ContractState, cash: u256, borrows: u256) -> u256 {
+        fn _utilization_rate(self: @ContractState, cash: u128, borrows: u128) -> u128 {
             // Avoid divide by 0
             if borrows.is_zero() {
                 return 0;
@@ -973,7 +973,7 @@ mod Collateral {
         ///
         /// # Returns
         /// * The amount of shares minted to the DAO Reserves
-        fn _mint_reserves(ref self: ContractState, cash: u256, borrows: u256, interest: u256) -> u256 {
+        fn _mint_reserves(ref self: ContractState, cash: u128, borrows: u128, interest: u128) -> u128 {
             /// Get the reserves (interest accrued * reserve factor)
             let new_reserves = interest.mul_wad(self.reserve_factor.read());
 
@@ -1021,7 +1021,7 @@ mod Collateral {
         /// * The latest borrow index
         /// * The time elapsed since last accrual
         /// * The interest accumulated since last accrual
-        fn _borrow_indices(self: @ContractState) -> (u256, u256, u256, u64, u256) {
+        fn _borrow_indices(self: @ContractState) -> (u128, u128, u128, u64, u128) {
             /// 1. Get available cash, total borrows and current borrow index stored
             let cash = self.total_balance.read();
             let mut total_borrows = self.total_borrows.read();
@@ -1055,7 +1055,7 @@ mod Collateral {
         /// # Returns
         /// * The borrower's principal (actual borrowed amount)
         /// * The borrowed amount with interest
-        fn _borrow_balance(self: @ContractState, borrower: ContractAddress, accrue: bool) -> (u256, u256) {
+        fn _borrow_balance(self: @ContractState, borrower: ContractAddress, accrue: bool) -> (u128, u128) {
             // Load borrower snapshot
             let snapshot: BorrowSnapshot = self.borrow_balances.read(borrower);
 
@@ -1086,7 +1086,7 @@ mod Collateral {
         ///
         /// # Arguments
         /// Caclulate borrow rate internally
-        fn _borrow_rate(self: @ContractState, cash: u256, borrows: u256) -> u256 {
+        fn _borrow_rate(self: @ContractState, cash: u128, borrows: u128) -> u128 {
             // Real model stored vars
             let model: InterestRateModel = self.interest_rate_model.read();
 
@@ -1125,8 +1125,8 @@ mod Collateral {
         /// # Returns
         /// * The total account borrows after the update
         fn _update_borrow(
-            ref self: ContractState, borrower: ContractAddress, borrow_amount: u256, repay_amount: u256
-        ) -> u256 {
+            ref self: ContractState, borrower: ContractAddress, borrow_amount: u128, repay_amount: u128
+        ) -> u128 {
             // Load snapshot - We have already accrued since this function is only called
             // after `borrow()` or `liquidate()` which accrue beforehand
             let (_, borrow_balance) = self._borrow_balance(borrower, accrue: false);
@@ -1206,7 +1206,7 @@ mod Collateral {
         /// * `balance` - Balance of CygUSD for lenders, the USDC borrow balance for borrowers
         /// * `collateral` - The address of the collateral. For lenders, this is always the zero address
         fn _track_rewards(
-            ref self: ContractState, account: ContractAddress, balance: u256, collateral: ContractAddress
+            ref self: ContractState, account: ContractAddress, balance: u128, collateral: ContractAddress
         ) {
             /// Get current pillars
             let pillars = self.pillars_of_creation.read();
@@ -1232,7 +1232,7 @@ mod Collateral {
         /// Preview our total balance deposited in the strategy.
         /// This is a helper function that is used only when syncing our balance with the `_update` function.
         #[inline(always)]
-        fn _preview_total_balance(self: @ContractState) -> u256 {
+        fn _preview_total_balance(self: @ContractState) -> u128 {
             /// zkUSDC rebases on each interest accrual, so our underlying balance is our zkUSDC balance
             self.zk_lend_usdc.read().balanceOf(get_contract_address()).try_into().unwrap()
         }
@@ -1242,7 +1242,7 @@ mod Collateral {
         /// # Arguments
         /// * `amount` - The amount of underlying stablecoin to deposit into the strategy
         #[inline(always)]
-        fn _after_deposit(ref self: ContractState, amount: u256) {
+        fn _after_deposit(ref self: ContractState, amount: u128) {
             /// Get the zkLend market from storage
             let zk_lend_market = self.zk_lend_market.read();
 
@@ -1256,7 +1256,7 @@ mod Collateral {
         /// # Arguments
         /// * `amount` - The amount of underlying stablecoin to withdraw from the zkLend market
         #[inline(always)]
-        fn _before_withdraw(ref self: ContractState, amount: u256) {
+        fn _before_withdraw(ref self: ContractState, amount: u128) {
             /// Get the zkLend market from storage
             let market = self.zk_lend_market.read();
 
@@ -1299,7 +1299,7 @@ mod Collateral {
         /// Get the balance of USDC currently in this contract
         /// The vault should never have USDC unless when repaying and depositing,
         /// and it then gets deposited in the strategy
-        fn _check_balance(self: @ContractState, token: ERC20ABIDispatcher) -> u256 {
+        fn _check_balance(self: @ContractState, token: ERC20ABIDispatcher) -> u128 {
             token.balanceOf(get_contract_address()).try_into().unwrap()
         }
     }

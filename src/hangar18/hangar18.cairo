@@ -46,7 +46,7 @@
 //!
 //! Orbiters = Strategies for the underlying assets.
 #[starknet::contract]
-pub(crate) mod Hangar18 {
+pub mod Hangar18 {
     use core::num::traits::Zero;
     /// ═══════════════════════════════════════════════════════════════════════════════════════════════════════
     ///     1. IMPORTS
@@ -75,6 +75,7 @@ pub(crate) mod Hangar18 {
     use cygnus::types::orbiter::{Orbiter};
     use cygnus::types::shuttle::{Shuttle};
     use cygnus::utils::math::MathLib::MathLibTrait;
+    use ekubo::types::keys::PoolKey;
 
     use starknet::{ContractAddress, get_tx_info, get_block_timestamp, get_caller_address};
 
@@ -252,7 +253,7 @@ pub(crate) mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn borrowable_tvl_usd(self: @ContractState, shuttle_id: u32) -> u256 {
+        fn borrowable_tvl_usd(self: @ContractState, shuttle_id: u32) -> u128 {
             /// Borrowable contract of this shuttle
             let borrowable = self.all_shuttles.read(shuttle_id).borrowable;
 
@@ -267,7 +268,7 @@ pub(crate) mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn collateral_tvl_usd(self: @ContractState, shuttle_id: u32) -> u256 {
+        fn collateral_tvl_usd(self: @ContractState, shuttle_id: u32) -> u128 {
             /// Collateral contract of this shuttle
             let collateral = self.all_shuttles.read(shuttle_id).collateral;
 
@@ -282,14 +283,14 @@ pub(crate) mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn shuttle_tvl_usd(self: @ContractState, shuttle_id: u32) -> u256 {
+        fn shuttle_tvl_usd(self: @ContractState, shuttle_id: u32) -> u128 {
             /// Borrowable TVL + Collateral TVL
             self.borrowable_tvl_usd(shuttle_id) + self.collateral_tvl_usd(shuttle_id)
         }
 
         /// # Implementation
         /// * IHangar18
-        fn all_borrowables_tvl(self: @ContractState) -> u256 {
+        fn all_borrowables_tvl(self: @ContractState) -> u128 {
             /// Get total shuttles and initialize length and tvl accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut length = 0;
@@ -309,7 +310,7 @@ pub(crate) mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn all_collaterals_tvl(self: @ContractState) -> u256 {
+        fn all_collaterals_tvl(self: @ContractState) -> u128 {
             /// Get total shuttles and initialize length and tvl accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut length = 0;
@@ -329,7 +330,7 @@ pub(crate) mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn cygnus_tvl_usd(self: @ContractState) -> u256 {
+        fn cygnus_tvl_usd(self: @ContractState) -> u128 {
             /// Get total shuttles and initialize length and tvl accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut length = 0;
@@ -354,7 +355,7 @@ pub(crate) mod Hangar18 {
 
         /// # Implementation
         /// * IHangar18
-        fn cygnus_total_borrows_usd(self: @ContractState) -> u256 {
+        fn cygnus_total_borrows_usd(self: @ContractState) -> u128 {
             /// Get total shuttles and initialize length and borrows accumulator
             let total_shuttles = self.total_shuttles.read();
             let mut borrows = 0;
@@ -450,7 +451,7 @@ pub(crate) mod Hangar18 {
         /// # Implementation
         /// * IHangar18
         fn deploy_shuttle(
-            ref self: ContractState, orbiter_id: u32, lp_token_pair: ContractAddress
+            ref self: ContractState, orbiter_id: u32, pool_key: PoolKey
         ) -> (IBorrowableDispatcher, ICollateralDispatcher) {
             /// Check sender is admin
             self._check_admin();
@@ -467,7 +468,7 @@ pub(crate) mod Hangar18 {
 
             // 3. Get Oracle
             // Check the registry for the oracle for this LP
-            let oracle: ContractAddress = self.nebula_registry.read().get_lp_token_nebula_address(lp_token_pair);
+            let oracle: ContractAddress = self.nebula_registry.read().get_lp_token_nebula_address(pool_key);
 
             /// # Error
             /// * `ORACLE_NOT_INITIALIZED` - Revert if we have no oracle for this LP
@@ -478,7 +479,7 @@ pub(crate) mod Hangar18 {
             let collateral: ICollateralDispatcher = orbiter
                 .deneb_orbiter
                 .deploy_collateral(
-                    lp_token_pair, IBorrowableDispatcher { contract_address: Zero::zero() }, oracle, shuttle_id
+                    pool_key, IBorrowableDispatcher { contract_address: Zero::zero() }, oracle, shuttle_id
                 );
 
             /// Use borrowable orbiter to deploy stablecoin pool with deployed collateral address

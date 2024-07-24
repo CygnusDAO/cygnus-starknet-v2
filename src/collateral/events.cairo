@@ -1,3 +1,4 @@
+use cygnus::types::terminal::{DepositParams, RedeemParams};
 use starknet::{ContractAddress};
 
 /// Transfer
@@ -26,19 +27,16 @@ pub struct SyncBalance {
 #[derive(Drop, starknet::Event)]
 pub struct Deposit {
     pub caller: ContractAddress,
-    pub recipient: ContractAddress,
-    pub assets: u128,
-    pub shares: u128
+    pub liquidity: u128,
+    pub params: DepositParams
 }
 
 /// Withdraw
 #[derive(Drop, starknet::Event)]
 pub struct Withdraw {
     pub caller: ContractAddress,
-    pub recipient: ContractAddress,
-    pub owner: ContractAddress,
-    pub assets: u128,
-    pub shares: u128
+    pub liquidity: u128,
+    pub params: RedeemParams
 }
 
 

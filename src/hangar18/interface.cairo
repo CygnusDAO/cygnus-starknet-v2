@@ -6,6 +6,7 @@ use cygnus::orbiters::albireo::{IAlbireoDispatcher, IAlbireoDispatcherTrait};
 use cygnus::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
 use cygnus::types::orbiter::Orbiter;
 use cygnus::types::shuttle::Shuttle;
+use ekubo::types::keys::PoolKey;
 
 use starknet::ContractAddress;
 
@@ -74,7 +75,7 @@ pub trait IHangar18<T> {
     ///
     /// # Returns
     /// * The TVL of the shuttle
-    fn shuttle_tvl_usd(self: @T, shuttle_id: u32) -> u256;
+    fn shuttle_tvl_usd(self: @T, shuttle_id: u32) -> u128;
 
     /// Gets a collateral tvl (LP deposits) priced in USD
     ///
@@ -83,7 +84,7 @@ pub trait IHangar18<T> {
     ///
     /// # Returns
     /// * The TVL of the collateral
-    fn collateral_tvl_usd(self: @T, shuttle_id: u32) -> u256;
+    fn collateral_tvl_usd(self: @T, shuttle_id: u32) -> u128;
 
     /// Gets a borrowable tvl (USDC deposits + borrows) priced in USD
     ///
@@ -92,23 +93,23 @@ pub trait IHangar18<T> {
     ///
     /// # Returns
     /// * The TVL of the borrowable
-    fn borrowable_tvl_usd(self: @T, shuttle_id: u32) -> u256;
+    fn borrowable_tvl_usd(self: @T, shuttle_id: u32) -> u128;
 
     /// # Returns
     /// * Cygnus protocol current total borrows
-    fn cygnus_total_borrows_usd(self: @T) -> u256;
+    fn cygnus_total_borrows_usd(self: @T) -> u128;
 
     /// # Returns
     /// * The tvl of all collaterals 
-    fn all_collaterals_tvl(self: @T) -> u256;
+    fn all_collaterals_tvl(self: @T) -> u128;
 
     /// # Returns
     /// * The tvl of all borrowbales
-    fn all_borrowables_tvl(self: @T) -> u256;
+    fn all_borrowables_tvl(self: @T) -> u128;
 
     /// # Returns
     /// * The tvl of the whole protocol on Starknet
-    fn cygnus_tvl_usd(self: @T) -> u256;
+    fn cygnus_tvl_usd(self: @T) -> u128;
 
     /// --------------------------------------------------------------------------------------------------------
     ///                                      NON-CONSTANT FUNCTIONS
@@ -137,7 +138,7 @@ pub trait IHangar18<T> {
     /// # Returns
     /// * Borrowable and collateral contracts deployed
     fn deploy_shuttle(
-        ref self: T, orbiter_id: u32, lp_token_pair: ContractAddress
+        ref self: T, orbiter_id: u32, pool_key: PoolKey
     ) -> (IBorrowableDispatcher, ICollateralDispatcher);
 
     /// Sets a new pending admin for the factory. This admin controls the most important

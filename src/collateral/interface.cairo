@@ -1,4 +1,7 @@
 use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
+use cygnus::types::terminal::{DepositParams, RedeemParams};
+use ekubo::types::keys::PoolKey;
+
 /// # Title
 /// * `CygnusCollateral`
 ///
@@ -29,6 +32,9 @@ pub trait ICollateral<T> {
     /// * The address of the underlying LP
     fn underlying(self: @T) -> ContractAddress;
 
+    /// The Ekubo pool key
+    fn pool_key(self: @T) -> PoolKey;
+
     /// Each collateral only has 1 borrowable which may borrow funds from
     ///
     /// # Returns
@@ -48,14 +54,14 @@ pub trait ICollateral<T> {
     fn shuttle_id(self: @T) -> u32;
 
     /// # Returns the total balance of the underlying deposited in the strategy
-    fn total_balance(self: @T) -> u256;
+    fn total_balance(self: @T, id: u64) -> u128;
 
     /// Returns the total LP assets held by the vault (ie. total_balance)
-    fn total_assets(self: @T) -> u256;
+    fn total_assets(self: @T) -> u128;
 
     /// Returns the exchange rate between 1 unit of CygLP shares to assets. IE. How much LP
     /// can be redeemed by redeeming 1 unit of CygLP shares. It should never be below 1e18.
-    fn exchange_rate(self: @T) -> u256;
+    fn exchange_rate(self: @T) -> u128;
 
     /// Deposits underlying assets in the pool
     ///
@@ -68,8 +74,7 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of shares minted
-    fn deposit(ref self: T, assets: u256, recipient: ContractAddress) -> u256;
-
+    fn deposit(ref self: T, params: DepositParams) -> u128;
 
     /// Redeems CygUSD for USDC Tokens
     ///
@@ -83,26 +88,31 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of assets withdrawn
-    fn redeem(ref self: T, shares: u256, recipient: ContractAddress, owner: ContractAddress) -> u256;
+    fn redeem(ref self: T, params: RedeemParams) -> (u128, u128);
 
     /// Force sync our balance with the total deposited in the strategy
     ///
     /// # Security
     /// * Non-reentrant
-    fn sync(ref self: T);
+    fn sync(ref self: T, token_id: u64);
+
+    // On received
+    fn on_erc721_received(
+        self: @T, operator: ContractAddress, from: ContractAddress, token_id: u128, data: Span<felt252>
+    ) -> felt252;
 
     ///--------------------------------------------------------------------------------------------------------
     ///                                          3. CONTROL
     ///--------------------------------------------------------------------------------------------------------
 
     /// # Returns the current pool's debt ratio
-    fn debt_ratio(self: @T) -> u256;
+    fn debt_ratio(self: @T) -> u128;
 
     /// # Returns the current pool's liquidation fee
-    fn liquidation_fee(self: @T) -> u256;
+    fn liquidation_fee(self: @T) -> u128;
 
     /// # Returns the current pool's liquidation incentive
-    fn liquidation_incentive(self: @T) -> u256;
+    fn liquidation_incentive(self: @T) -> u128;
 
     /// Sets the borrowable during deployment. Can only be set once (does address zero check).
     ///
@@ -125,7 +135,7 @@ pub trait ICollateral<T> {
     ///
     /// # Returns 
     /// * Whether or not `borrower` can borrow `amount`
-    fn can_borrow(self: @T, borrower: ContractAddress, amount: u256) -> bool;
+    fn can_borrow(self: @T, borrower: ContractAddress, amount: u128) -> bool;
 
     /// Checks whether or not a borrower can redeem a certain amount of CygLP
     ///
@@ -136,7 +146,7 @@ pub trait ICollateral<T> {
     /// # Returns
     /// * Whether or not the borrower can withdraw 'amount' of CygLP. If false then it means withdrawing
     ///   this amount of CygLP would put user in shortfall and withdrawing this would cause the tx to revert
-    fn can_redeem(self: @T, borrower: ContractAddress, amount: u256) -> bool;
+    fn can_redeem(self: @T, borrower: ContractAddress, amount: u128) -> bool;
 
     /// Checks a borrower's current liquidity and shortfall. 
     /// 
@@ -146,11 +156,11 @@ pub trait ICollateral<T> {
     /// # Returns
     /// * The maximum amount of USDC that the `borrower` can borrow (if shortfall then this == 0)
     /// * The current shortfall of USDC (if liquidity then this == 0)
-    fn get_account_liquidity(self: @T, borrower: ContractAddress) -> (u256, u256);
+    fn get_account_liquidity(self: @T, borrower: ContractAddress) -> (u128, u128);
 
     /// # Returns
     /// * The price of the underlying LP Token, denominated in the borrowable`s underlying
-    fn get_lp_token_price(self: @T) -> u256;
+    fn get_lp_token_price(self: @T) -> u128;
 
     /// Quick check to see borrower`s position
     ///
@@ -161,7 +171,7 @@ pub trait ICollateral<T> {
     /// * The borrower's position in LPs
     /// * The borrower's position in USD
     /// * The borrower's health (0.5e18 = 50%, liquidatable at 100% ie 1e18)
-    fn get_borrower_position(self: @T, borrower: ContractAddress) -> (u256, u256, u256);
+    fn get_borrower_position(self: @T, borrower: ContractAddress) -> (u128, u128, u128);
 
     ///--------------------------------------------------------------------------------------------------------
     ///                                          5. COLLATERAL
@@ -181,7 +191,7 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of CygLP seized
-    fn seize_cyg_lp(ref self: T, liquidator: ContractAddress, borrower: ContractAddress, repay_amount: u256) -> u256;
+    fn seize_cyg_lp(ref self: T, liquidator: ContractAddress, borrower: ContractAddress, repay_amount: u128) -> u128;
 
     /// Flash redeems LP from the vault and sends it to `redeemer`, expecting an equivalent amount of CygLP to be received
     /// by the end of the function.
@@ -196,6 +206,6 @@ pub trait ICollateral<T> {
     ///
     /// # Returns
     /// * The amount of USDC received (if any)
-    fn flash_redeem(ref self: T, redeemer: ContractAddress, redeem_amount: u256, calldata: Array<felt252>) -> u256;
+    fn flash_redeem(ref self: T, redeemer: ContractAddress, redeem_amount: u128, calldata: Array<felt252>) -> u128;
 }
 

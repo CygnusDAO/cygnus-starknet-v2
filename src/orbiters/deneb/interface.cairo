@@ -1,6 +1,7 @@
 // Imports
 use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
 use cygnus::collateral::{ICollateralDispatcher, ICollateralDispatcherTrait};
+use ekubo::types::keys::{PoolKey};
 
 // Libraries
 use starknet::{ClassHash, ContractAddress};
@@ -23,10 +24,6 @@ pub trait IDeneb<T> {
     /// # Returns
     /// * The deployed collateral contract
     fn deploy_collateral(
-        ref self: T,
-        underlying: ContractAddress,
-        borrowable: IBorrowableDispatcher,
-        oracle: ContractAddress,
-        shuttle_id: u32
+        ref self: T, pool_key: PoolKey, borrowable: IBorrowableDispatcher, oracle: ContractAddress, shuttle_id: u32
     ) -> ICollateralDispatcher;
 }

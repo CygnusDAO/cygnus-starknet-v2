@@ -1,10 +1,10 @@
 /// Quick library
 pub mod MathLib {
     /// Core
-    use core::integer::{u256_wide_mul, u512_safe_div_rem_by_u256, u256_sqrt};
+    use core::integer::{u128_wide_mul, u512_safe_div_rem_by_u256, u128_sqrt, u256_wide_mul};
 
     /// Constants
-    const WAD: u256 = 1_000000000_000000000;
+    const WAD: u128 = 1_000000000_000000000;
 
     /// Trait
     pub trait MathLibTrait<T> {
@@ -36,46 +36,46 @@ pub mod MathLib {
     ///                                 IMPLEMENTATION
     /// ------------------------------------------------------------------------------------
 
-    pub impl MathLibImpl of MathLibTrait<u256> {
+    pub impl MathLibImpl of MathLibTrait<u128> {
         /// # Implementation
         /// * MathLibTrait
-        fn full_mul_div(self: @u256, y: u256, d: u256) -> u256 {
+        fn full_mul_div(self: @u128, y: u128, d: u128) -> u128 {
             mul_div(*self, y, d)
         }
 
         /// # Implementation
         /// * MathLibTrait
-        fn full_mul_div_up(self: @u256, y: u256, d: u256) -> u256 {
+        fn full_mul_div_up(self: @u128, y: u128, d: u128) -> u128 {
             mul_div(*self, y, d)
         }
 
         /// # Implementation
         /// * MathLibTrait
-        fn div_wad(self: @u256, y: u256) -> u256 {
+        fn div_wad(self: @u128, y: u128) -> u128 {
             mul_div(*self, WAD, y)
         }
 
         /// # Implementation
         /// * MathLibTrait
-        fn div_wad_up(self: @u256, y: u256) -> u256 {
+        fn div_wad_up(self: @u128, y: u128) -> u128 {
             mul_div(*self, WAD, y)
         }
 
         /// # Implementation
         /// * MathLibTrait
-        fn mul_wad(self: @u256, y: u256) -> u256 {
+        fn mul_wad(self: @u128, y: u128) -> u128 {
             mul_div(*self, y, WAD)
         }
 
         /// # Implementation
         /// * MathLibTrait
-        fn mul_wad_up(self: @u256, y: u256) -> u256 {
+        fn mul_wad_up(self: @u128, y: u128) -> u128 {
             mul_div(*self, y, WAD)
         }
 
         /// # Implementation
         /// * MathLibTrait
-        fn pow(self: @u256, n: u256) -> u256 {
+        fn pow(self: @u128, n: u128) -> u128 {
             pow256(*self, n)
         }
     }
@@ -88,8 +88,8 @@ pub mod MathLib {
     /// * `x` - The number to raise.
     /// * `n` - The exponent.
     /// # Returns
-    /// * `u256` - The result of x raised to the power of n.
-    fn pow256(x: u256, n: u256) -> u256 {
+    /// * `u128` - The result of x raised to the power of n.
+    fn pow256(x: u128, n: u128) -> u128 {
         if n == 0 {
             1
         } else if n == 1 {
@@ -106,10 +106,13 @@ pub mod MathLib {
     /// * `value` - The value muldiv is applied to.
     /// * `numerator` - The numerator that multiplies value.
     /// * `divisor` - The denominator that divides value.
-    fn mul_div(value: u256, numerator: u256, denominator: u256) -> u256 {
+    fn mul_div(value: u128, numerator: u128, denominator: u128) -> u128 {
+        let value = u256 { low: value, high: 0 };
+        let numerator = u256 { low: numerator, high: 0 };
+        let denominator = u256 { low: denominator, high: 0 };
         let product = u256_wide_mul(value, numerator);
         let (q, _) = u512_safe_div_rem_by_u256(product, denominator.try_into().unwrap());
-        assert(q.limb2 == 0 && q.limb3 == 0, 'MulDivOverflow');
-        u256 { low: q.limb0, high: q.limb1 }
+        assert(q.limb1 == 0 && q.limb2 == 0 && q.limb3 == 0, 'MulDivOverflow');
+        q.limb0
     }
 }
