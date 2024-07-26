@@ -1,6 +1,6 @@
 /// Deployers
-use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
-use cygnus::collateral::{ICollateralDispatcher, ICollateralDispatcherTrait};
+use cygnus::core::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
+use cygnus::core::collateral::{ICollateralDispatcher, ICollateralDispatcherTrait};
 
 /// Shuttle struct
 #[derive(Drop, starknet::Store, Serde)]

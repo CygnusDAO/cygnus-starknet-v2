@@ -1,4 +1,4 @@
-use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
+use cygnus::core::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
 use cygnus::types::periphery::{Aggregator};
 use cygnus::types::periphery::{ShuttleInfoC, ShuttleInfoB, BorrowerPosition, LenderPosition};
 use openzeppelin::token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};

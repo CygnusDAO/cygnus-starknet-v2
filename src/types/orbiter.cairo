@@ -1,6 +1,6 @@
 /// Deployers
-use cygnus::orbiters::albireo::{IAlbireoDispatcher, IAlbireoDispatcherTrait};
-use cygnus::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
+use cygnus::core::orbiters::albireo::{IAlbireoDispatcher, IAlbireoDispatcherTrait};
+use cygnus::core::orbiters::deneb::{IDenebDispatcher, IDenebDispatcherTrait};
 
 /// Struct of borrowable & collateral deployers stored in factory
 ///

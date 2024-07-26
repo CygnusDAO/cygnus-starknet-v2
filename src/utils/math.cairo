@@ -1,5 +1,5 @@
 /// Quick library
-pub mod MathLib {
+pub(crate) mod MathLib {
     /// Core
     use core::integer::{u128_wide_mul, u512_safe_div_rem_by_u256, u128_sqrt, u256_wide_mul};
 
@@ -101,6 +101,8 @@ pub mod MathLib {
         }
     }
 
+    /// Taken from Satoru: https://github.com/keep-starknet-strange/satoru
+    ///
     /// Apply multiplication then division to value.
     /// # Arguments
     /// * `value` - The value muldiv is applied to.

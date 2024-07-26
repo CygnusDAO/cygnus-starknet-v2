@@ -1,18 +1,13 @@
+use cygnus::types::ekubo::{PoolKeyCYG};
 use starknet::ContractAddress;
 
 #[derive(Drop, starknet::Store, Serde, Copy)]
 pub struct NebulaOracle {
-    initialized: bool,
-    oracle_id: u8,
-    name: felt252,
-    underlying: ContractAddress,
-    token0: ContractAddress,
-    token1: ContractAddress,
-    price_feed0: felt252,
-    price_feed1: felt252,
-    token0_decimals: u64,
-    token1_decimals: u64,
-    created_at: u64
+    pub initialized: bool,
+    pub oracle_id: u8,
+    pub price_feed0: felt252,
+    pub price_feed1: felt252,
+    pub pool_key: PoolKeyCYG
 }
 
 #[derive(Drop, Serde)]

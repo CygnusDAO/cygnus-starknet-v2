@@ -1,4 +1,4 @@
-use cygnus::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
+use cygnus::core::borrowable::{IBorrowableDispatcher, IBorrowableDispatcherTrait};
 use cygnus::periphery::altair_x::{IAltairXDispatcher, IAltairXDispatcherTrait};
 use cygnus::types::periphery::{Aggregator};
 
@@ -96,7 +96,7 @@ pub trait IAltair<T> {
     ///
     /// # Returns
     /// * The amount of token0 and token1 received
-    fn get_assets_for_shares(self: @T, lp_token: ContractAddress, shares: u256) -> (u256, u256);
+    fn get_assets_for_shares(self: @T, lp_token: ContractAddress, shares: u128) -> (u128, u128);
 
     /// -------------------------------------------------------------------------------------------------------
     ///                                      NON-CONSTANT FUNCTIONS
@@ -110,7 +110,7 @@ pub trait IAltair<T> {
     /// * `recipient` - The address of the recipient of the loan
     /// * `deadline` - The maximum timestamp allowed for tx to succeed
     fn borrow(
-        ref self: T, borrowable: IBorrowableDispatcher, borrow_amount: u256, recipient: ContractAddress, deadline: u64
+        ref self: T, borrowable: IBorrowableDispatcher, borrow_amount: u128, recipient: ContractAddress, deadline: u64
     );
 
     /// Borrows USDC and buys more LP, depositing back in Cygnus and minting CygLP to the caller
@@ -131,12 +131,12 @@ pub trait IAltair<T> {
         lp_token_pair: ContractAddress,
         collateral: ContractAddress,
         borrowable: ContractAddress,
-        borrow_amount: u256,
-        lp_amount_min: u256,
+        borrow_amount: u128,
+        lp_amount_min: u128,
         deadline: u64,
         aggregator: Aggregator,
         swapdata: Array<Span<felt252>>
-    ) -> u256;
+    ) -> u128;
 
     /// Burns the LP and buys USDC, repaying any debt the user may have (if any) and burning the user's CygLP
     ///
@@ -156,12 +156,12 @@ pub trait IAltair<T> {
         lp_token_pair: ContractAddress,
         collateral: ContractAddress,
         borrowable: ContractAddress,
-        cyg_lp_amount: u256,
-        usd_amount_min: u256,
+        cyg_lp_amount: u128,
+        usd_amount_min: u128,
         deadline: u64,
         aggregator: Aggregator,
         swapdata: Array<Span<felt252>>
-    ) -> u256;
+    ) -> u128;
 
     /// Main function used to repay a loan
     ///
@@ -170,7 +170,7 @@ pub trait IAltair<T> {
     /// * `repay_amount` - The amount of USD to repay
     /// * `borrower` - The address of the borrower whose loan we are repaying
     /// * `deadline` - The maximum timestamp allowed for tx to succeed
-    fn repay(ref self: T, borrowable: ContractAddress, repay_amount: u256, borrower: ContractAddress, deadline: u64);
+    fn repay(ref self: T, borrowable: ContractAddress, repay_amount: u128, borrower: ContractAddress, deadline: u64);
 
     /// Main liquidate function to repay a loan and seize CygLP
     ///
@@ -187,11 +187,11 @@ pub trait IAltair<T> {
     fn liquidate(
         ref self: T,
         borrowable: ContractAddress,
-        repay_amount: u256,
+        repay_amount: u128,
         borrower: ContractAddress,
         recipient: ContractAddress,
         deadline: u64
-    ) -> (u256, u256);
+    ) -> (u128, u128);
 
     /// Main function to flash liquidate borrows. Ie, liquidating a user without needing to have USD
     ///
@@ -209,12 +209,12 @@ pub trait IAltair<T> {
         ref self: T,
         borrowable: ContractAddress,
         collateral: ContractAddress,
-        repay_amount: u256,
+        repay_amount: u128,
         borrower: ContractAddress,
         deadline: u64,
         aggregator: Aggregator,
         swapdata: Array<Span<felt252>>
-    ) -> u256;
+    ) -> u128;
 
     /// -------------------------------------------------------------------------------------------------------
     ///                                              CALLBACKS
@@ -230,7 +230,7 @@ pub trait IAltair<T> {
     ///
     /// # Returns
     /// * The amount of LP minted
-    fn altair_borrow_09E(ref self: T, sender: ContractAddress, borrow_amount: u256, calldata: Array<felt252>) -> u256;
+    fn altair_borrow_09E(ref self: T, sender: ContractAddress, borrow_amount: u128, calldata: Array<felt252>) -> u128;
 
     /// Function that is called by the CygnusCollateral contract and decodes data to carry out the deleverage.
     /// Will only succeed if: Caller is collateral contract & collateral contract was called by router
@@ -242,7 +242,7 @@ pub trait IAltair<T> {
     ///
     /// # Returns
     /// * The amount of USDC received from deleveraging LP
-    fn altair_redeem_u91A(ref self: T, sender: ContractAddress, redeem_amount: u256, calldata: Array<felt252>) -> u256;
+    fn altair_redeem_u91A(ref self: T, sender: ContractAddress, redeem_amount: u128, calldata: Array<felt252>) -> u128;
 
     /// Function that is called by the CygnusBorrow contract to carry out the flash liqudiation.
     /// Will only succeed if: Caller is borrow contract & Borrow contract was called by router
@@ -256,7 +256,7 @@ pub trait IAltair<T> {
     /// # Returns
     /// * The amount of LP minted
     fn altair_liquidate_f2x(
-        ref self: T, sender: ContractAddress, cyg_lp_amount: u256, repay_amount: u256, calldata: Array<felt252>
+        ref self: T, sender: ContractAddress, cyg_lp_amount: u128, repay_amount: u128, calldata: Array<felt252>
     );
 
     /// -------------------------------------------------------------------------------------------------------
